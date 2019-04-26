@@ -3,7 +3,10 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  loginPoint: 'https://auth-service-huachicol.herokuapp.com/oauth/token',
+  userAuth: 'angularjwtclientid',
+  passAuth: '12345'
 };
 
 /*

@@ -1,0 +1,19 @@
+.dark-modal .modal-content {
+  background-color: #292b2c;
+  color: white;
+}
+.dark-modal .close {
+  color: white;
+}
+.light-blue-backdrop {
+  background-color: #5cb3fd;
+}
+
+.login {
+  background-color: transparent !important;
+  border: none;
+  padding: 0px;
+  font-size: 0.9375rem;
+  font-weight: 300;
+  color: #000;
+}
