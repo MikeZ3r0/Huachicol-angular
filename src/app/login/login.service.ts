@@ -2,19 +2,22 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import {environment} from '../../environments/environment';
 import { map } from 'rxjs/operators';
+import {Router} from '@angular/router';
 
 @Injectable()
 export class LoginService {
   httpOptions: {};
+  httpOptionsAuth: {};
+  token;
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private router: Router) {
     this.httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/x-www-form-urlencoded',
         Authorization: 'Basic ' + btoa(environment.userAuth + ':' + environment.passAuth),
       })
     };
-    let token = this.obtenerToken();
+    this.token = this.obtenerToken();
   }
 
   log(logUsuario, logContrasena) {
@@ -30,12 +33,30 @@ export class LoginService {
     );
   }
 
+
   obtenerToken() {
-    const userData = localStorage.getItem('userAuth');
-    if (!userData) {
+    const token = localStorage.getItem('token');
+    if (!token) {
       return null;
     }
-    const userJSON = JSON.parse(userData);
-    return userJSON.access_token;
+    return token;
+  }
+
+  obtenerDatos() {
+    this.token = this.obtenerToken();
+    if (!this.token) {
+      return null;
+    }
+    this.httpOptionsAuth = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Authorization: 'Bearer ' + this.token,
+      })
+    };
+    return this.http.get(environment.reportPoint, this.httpOptionsAuth).pipe(
+      map( datos => {
+        return datos;
+      })
+    );
   }
 }

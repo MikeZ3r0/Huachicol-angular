@@ -8,18 +8,23 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { HttpClientModule} from '@angular/common/http';
 import {LoginService} from './login/login.service';
 
-import { AppRoutingModule } from './app-routing.module';
+import { AppRoutingModule, routingComponents } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { NavbarComponent} from './navBar/navbar.component';
 import { LoginComponent } from './login/login.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
+import { MapaComponent } from './mapa/mapa.component';
+
 
 
 @NgModule({
   declarations: [
     AppComponent,
     NavbarComponent,
-    LoginComponent
+    LoginComponent,
+    MapaComponent,
+    routingComponents
   ],
   imports: [
     BrowserModule,

@@ -1,0 +1,18 @@
+<app-navbar></app-navbar>
+
+<div class="container col-lg-12">
+  <h2 class="text-center text-uppercase text-secondary mb-0">Control de denuncias</h2>
+  <hr class="star-dark mb-5">
+  <div class="contenidoPemex col-lg-12 mx-auto">
+    <div class="row justify-content-between">
+      <div class="tabla col-lg-8">
+        <table class="denuncias" role="table" id="tablaDenuncias">
+          <tr *ngFor="let d of denuncias">
+            <td>{{d.Folio}}</td><td class="bcoordenadas">{{d.Coordenadas}}</td><td>{{d.Descripcion}}</td><td>{{d.Status}}</td><td>{{d.Distancia}}</td>
+          </tr>
+        </table>
+      </div>
+      <app-mapa></app-mapa>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,148 @@
+@media  only screen and (max-width: 900px){
+  table {
+    width:100%;
+  }
+  thead {
+    display: none;
+  }
+  tr:nth-of-type(2n) {
+    background-color: inherit;
+  }
+  tr td:first-child {
+    background: #f0f0f0;
+    font-weight:bold;
+    font-size:1.3em;
+  }
+  tbody td {
+    display: block;
+    text-align:center;
+  }
+  tbody td:before {
+    content: attr(data-th);
+    display: block;
+    text-align:center;
+  }
+  .accion{
+    height:15px;
+  }
+  .accion > div {
+    justify-content: space-between;
+    max-height: 30px;
+  }
+
+  .mfp-custom {
+    width: 100%;
+    right: 0;
+    box-sizing: border-box; }
+}
+
+.tabla {
+  margin-bottom: -15px;
+}
+
+.tabla tr{
+  margin: 6em auto 0 auto;
+}
+
+.denuncias thead{
+  font-size: 1.5em;
+  color: #fff;
+  background-color: #18BC9C;
+}
+
+.denuncias th, .denuncias td{
+  padding: 8px;
+}
+
+.denuncias tr:nth-child(even){
+  background-color: #f2f2f2
+}
+
+.rojo:before{
+
+  content: url("../../img/personal/dis_red.png");
+  vertical-align: middle;
+}
+
+.denuncias .amarillo:before{
+  content: url("../../img/personal/dis_yellow.png");
+}
+
+
+.denuncias .verde:before{
+  content: url("../../img/personal/dis_green.png");
+}
+
+.asignar{
+  float: left;
+}
+
+.eliminar{
+  float: right;
+}
+
+.denuncias .asignar button:before{
+  content: url("../../img/personal/star_check_green.png");
+}
+
+.denuncias .eliminar button:before{
+  content: url("../../img/personal/star_check_red.png");
+}
+
+
+.fol{
+  width:10%;
+}
+
+.coo{
+  width:15%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.des{
+  width:25%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sta{
+  width:10%;
+}
+
+.dis{
+  width:10%;
+}
+
+.acc{
+  width:30%;
+}
+
+@media (min-width: 800px) {
+  .mfp-custom {
+    width: 80%;
+    height: 60%;
+    right: 0;
+    top: 0;
+    padding: 0 8px; }
+}
+@media (min-width: 900px) {
+  .mfp-custom {
+    width: 60%;
+    height: 60%;
+    right: 0;
+    top: 0;
+    padding: 0 8px; }
+}
+@media (min-width: 1200px) {
+  .mfp-custom {
+    width: 40%;
+    height: 60%;
+    right: 0;
+    top: 0;
+    padding: 0 8px; }
+}
+
+.top-100{
+  margin-top: 100px;
+}

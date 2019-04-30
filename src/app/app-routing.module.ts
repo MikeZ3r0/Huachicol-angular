@@ -1,11 +1,14 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import {root} from 'rxjs/internal-compatibility';
-import {NavbarComponent} from './navBar/navbar.component';
+
 import {AuthGuard} from './login/auth.guard';
+import {AdministradorComponent} from './administrador/administrador.component';
+import {PrincipalComponent} from './principal/principal.component';
 
 const routes: Routes = [
-  { path: '', component: NavbarComponent, canActivate: [AuthGuard] }
+  { path: '', component: PrincipalComponent },
+  { path: 'admin', component: AdministradorComponent, canActivate: [AuthGuard]}
 ];
 
 @NgModule({
@@ -13,3 +16,4 @@ const routes: Routes = [
   exports: [RouterModule]
 })
 export class AppRoutingModule { }
+export const routingComponents = [PrincipalComponent, AdministradorComponent];
