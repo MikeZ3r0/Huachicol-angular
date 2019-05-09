@@ -2,15 +2,16 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import {environment} from '../../environments/environment';
 import { map } from 'rxjs/operators';
-import {Router} from '@angular/router';
+
 
 @Injectable()
 export class LoginService {
   httpOptions: {};
   httpOptionsAuth: {};
   token;
+  myAccount: boolean;
 
-  constructor(private http: HttpClient, private router: Router) {
+  constructor(private http: HttpClient) {
     this.httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -58,5 +59,22 @@ export class LoginService {
         return datos;
       })
     );
+  }
+
+  setAccount(estado) {
+    // Guarda el estado de la página mi cuenta
+    this.myAccount = estado;
+  }
+
+  getAccount() {
+    // Indica si se esta en la página de mi cuenta o no
+    return this.myAccount;
+  }
+
+  finalizarSesion() {
+    localStorage.removeItem('userAuth');
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    this.setAccount(false);
   }
 }

@@ -50,13 +50,14 @@ export class LoginComponent implements OnInit {
         this.cargando = false;
         (document.getElementById('logButton') as HTMLInputElement).disabled = false;
         this.modalReference.close();
+        this.loginService.setAccount(true);
         this.router.navigate(['admin']);
       }
     }, err => {
       this.cargando = false;
       (document.getElementById('logButton') as HTMLInputElement).disabled = false;
     }, () => {
-      console.log('FInalizado inicio de sesion');
+      console.log('Finalizado inicio de sesion');
     });
   }
 

@@ -23,8 +23,14 @@ export class AdministradorComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.iniciarVariables();
+  }
+  iniciarVariables() {
     const token = this.loginService.obtenerToken();
+    this.loginService.setAccount(true);
     if (!token) {
+      this.loginService.setAccount(false);
+      console.log('No fue posible obtener token, redirigiendo');
       this.router.navigate(['']);
     }
     this.loginService.obtenerDatos().subscribe( datos => {
@@ -35,13 +41,9 @@ export class AdministradorComponent implements OnInit {
       console.log(messageError + ' = ' + environment.invalidToken + ' : ');
       console.log(messageError.match(environment.invalidToken));
       if (messageError.match(environment.invalidToken) !== null) {
-        console.log('Token invalido: ' + environment.invalidToken);
-        localStorage.removeItem('userAuth');
-        localStorage.removeItem('user');
-        localStorage.removeItem('token');
+        this.loginService.finalizarSesion();
         this.router.navigate(['']);
       }
     });
   }
-
 }

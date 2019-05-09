@@ -44,6 +44,10 @@
   margin: 6em auto 0 auto;
 }
 
+#tablaDenuncias{
+  width: 100%;
+}
+
 .denuncias thead{
   font-size: 1.5em;
   color: #fff;
@@ -58,21 +62,6 @@
   background-color: #f2f2f2
 }
 
-.rojo:before{
-
-  content: url("../../img/personal/dis_red.png");
-  vertical-align: middle;
-}
-
-.denuncias .amarillo:before{
-  content: url("../../img/personal/dis_yellow.png");
-}
-
-
-.denuncias .verde:before{
-  content: url("../../img/personal/dis_green.png");
-}
-
 .asignar{
   float: left;
 }
@@ -80,15 +69,6 @@
 .eliminar{
   float: right;
 }
-
-.denuncias .asignar button:before{
-  content: url("../../img/personal/star_check_green.png");
-}
-
-.denuncias .eliminar button:before{
-  content: url("../../img/personal/star_check_red.png");
-}
-
 
 .fol{
   width:10%;
@@ -141,8 +121,4 @@
     right: 0;
     top: 0;
     padding: 0 8px; }
-}
-
-.top-100{
-  margin-top: 100px;
 }
