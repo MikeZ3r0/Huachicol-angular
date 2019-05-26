@@ -25,6 +25,7 @@ import {LeerJSONService} from '../leer-json.service';
 
 import {LoginService} from '../login/login.service';
 import {environment} from '../../environments/environment';
+import LineString from 'ol/geom/LineString';
 
 
 
@@ -248,7 +249,7 @@ export class MapaComponent implements OnInit {
       tCnv.width = size;
       tCnv.height = size;
       tCtx.rect(0, 0, size, size);
-      tCtx.fillStyle = 'rgba(10,10,10,0.5)';
+      tCtx.fillStyle = 'rgba(100,100,100,0.3)';
       tCtx.fill();
       tCtx.drawImage(img, 0, 0, img.width, img.height, 0, 0, size, size);
       const pattern = ctx.createPattern(tCnv, 'repeat');
@@ -266,18 +267,18 @@ export class MapaComponent implements OnInit {
       const datosJSON = JSON.parse(datos);
       let vector = new VectorSource();
       let line;
+      let points;
       datosJSON.content.forEach(item => {
-        console.log(item.location.coordinates);
-        line = new Feature();
-        for (let i of item.location.coordinates){
-          console.log(i);
-
+        points = [];
+        for (const i of item.location.coordinates) {
+          points.push(i.coordinates);
         }
-        console.log(item.location.coordinates.length);
+        line = new Feature({
+          geometry: new LineString(points)
+        });
+        vector.addFeature(line);
       });
-      sourceDuctos = new VectorSource({
-        features: (new GeoJSON()).readFeatures(datosJSON)
-      });
+      sourceDuctos = vector;
       this.ductosLayer = new Vector({
         source: sourceDuctos,
         style: estilo

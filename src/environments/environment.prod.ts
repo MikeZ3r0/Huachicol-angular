@@ -5,7 +5,7 @@ export const environment = {
   ductosPoint: 'https://complain-service-huachicol.herokuapp.com/api/v1/user/ductos/page/0',
   userAuth: 'angularjwtclientid',
   passAuth: '12345',
-  userRole: '',
+  userRole: 'CIUDADANO_ROLE',
   adminRole: 'ADMINISTRADOR_ROLE',
   invalidToken: 'invalid_token'
 };

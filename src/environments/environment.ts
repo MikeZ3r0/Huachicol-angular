@@ -6,10 +6,10 @@ export const environment = {
   production: false,
   loginPoint: 'https://auth-service-huachicol.herokuapp.com/oauth/token',
   reportPoint: 'https://complain-service-huachicol.herokuapp.com/api/v1/user/center/coordinates',
-  ductosPoint: 'https://complain-service-huachicol.herokuapp.com/api/v1/user/ductos/page/0',
+  ductosPoint: 'https://complain-service-huachicol.herokuapp.com/api/v1/user/ductos/page/',
   userAuth: 'angularjwtclientid',
   passAuth: '12345',
-  userRole: '',
+  userRole: 'CIUDADANO_ROLE',
   adminRole: 'ADMINISTRADOR_ROLE',
   invalidToken: 'invalid_token'
 };
