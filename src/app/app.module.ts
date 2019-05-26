@@ -15,6 +15,8 @@ import { LoginComponent } from './login/login.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { MapaComponent } from './mapa/mapa.component';
+import {LeerJSONService} from './leer-json.service';
+import { FormsModule } from '@angular/forms';
 
 
 
@@ -33,8 +35,9 @@ import { MapaComponent } from './mapa/mapa.component';
     NgbModule,
     HttpClientModule,
     BrowserAnimationsModule,
+    FormsModule
   ],
-  providers: [LoginService],
+  providers: [LoginService, LeerJSONService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

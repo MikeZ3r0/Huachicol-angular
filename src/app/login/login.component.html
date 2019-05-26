@@ -31,7 +31,11 @@
   </div>
   <div class="modal-footer">
     <div class="form-group top-100">
-      <button type="submit" class="btn btn-light btn-xl" id="logButton" (click)="logIn(username.value, password.value, $event)"><i [ngClass]="{'fa-sign-in-alt':!cargando, 'fa-sync': cargando}" class="fas"></i> Ingresar</button>
+      <button type="submit" class="btn btn-light btn-xl" id="logButton" (click)="logIn(username.value, password.value, $event)">
+        <i [ngClass]="{'fa-sign-in-alt':!cargando, 'fa-sync': cargando}" class="fas"></i>
+        <span *ngIf="!cargando">Ingresar</span>
+        <span *ngIf="cargando">Validando</span>
+      </button>
       <button type="button" class="btn btn-light" (click)="modal.close('Close click')" #closeLoginModal>Cerrar</button>
     </div>
 
@@ -39,4 +43,4 @@
 </ng-template>
 
 
-<button class="login waves-light" (click)="openVerticallyCentered(content)">Iniciar sesion</button>
+<button class="login waves-light" (click)="openVerticallyCentered(content)">Iniciar sesion <i class="fas fa-user-shield"></i></button>

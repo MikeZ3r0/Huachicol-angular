@@ -1,18 +1,98 @@
+<script src="../../../../startbootstrap-freelancer-gh-pages/js/freelancer.min.js"></script>
 <app-navbar></app-navbar>
 
-<div class="container col-lg-12">
+<div class="container col-md-12">
   <h2 class="text-center text-uppercase text-secondary mb-0">Control de denuncias</h2>
   <hr class="star-dark mb-5">
-  <div class="contenidoPemex col-lg-12 mx-auto">
+  <div class="contenidoPemex col-12 mx-auto">
     <div class="row justify-content-between">
-      <div class="tabla col-lg-8">
-        <table class="denuncias" role="table" id="tablaDenuncias">
-          <tr *ngFor="let d of denuncias">
-            <td>{{d.Folio}}</td><td class="bcoordenadas">{{d.Coordenadas}}</td><td>{{d.Descripcion}}</td><td>{{d.Status}}</td><td>{{d.Distancia}}</td>
-          </tr>
+      <div class="tabla col-lg-8 col-sm-12">
+        <table class="denuncias table table-hover table-responsive-sm " id="tablaDenuncias">
+          <thead class="thead-dark">
+            <tr scope="row">
+              <th >Folio</th>
+              <th>Coordenadas</th>
+              <th>Descripción</th>
+              <th>Status</th>
+              <th>Distancia al ducto</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let d of denuncias.features">
+              <th class="priority-1"> {{d.id}}</th>
+              <td data-th="Coordenadas: " class="priority-3 coo"> {{d.geometry.coordinates[1]}}, {{d.geometry.coordinates[0]}} </td>
+              <td data-th="Descripción: " class="priority-2 des">{{d.properties.Descripcion}}</td>
+              <td data-th="Status: " class="priority-1">{{d.properties.Status}}</td>
+              <td data-th="Distancia: " class="priority-3">{{d.properties.Distancia}}</td>
+              <td class="priority-1">
+                <div class="btn-group-sm justify-content-between btn-action">
+                  <button type="button" class="btn btn-dark" mdbWavesEffect (click)="openVerticallyCentered(pemex, d)" id="{{d.id}}">
+                    <i class="fas fa-tools"></i>
+                  </button>
+                  <button  type="button" class="btn btn-dark" mdbWavesEffect >
+                    <i class="fas fa-taxi"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
         </table>
       </div>
-      <app-mapa class="col-lg-4" [datos]="datos"></app-mapa>
+      <app-mapa class="col-lg-4 col-sm-12"></app-mapa>
     </div>
   </div>
 </div>
+
+<!-- Modal Tecnicos Pemex -->
+<ng-template #pemex let-modal>
+  <div class="modal-container">
+    <div class="modal-header">
+      <h4 class="modal-title">Técnicos de Pemex</h4>
+      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-12 mx-auto">
+            <div class="tabla col-sm-12">
+              <table class="pemex table table-hover table-responsive-sm" id="tablaPemex">
+                <thead class="thead-dark">
+                <tr scope="row">
+                  <th >ID</th>
+                  <th>Personal</th>
+                  <th>Status</th>
+                  <th>Distancia al ducto</th>
+                  <th>Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr *ngFor="let t of tecnicos.features">
+                  <th class="priority-1"> {{t.id}}</th>
+                  <td data-th="Nombre: " class="priority-2 nom"> {{t.properties.Nombre}}</td>
+                  <td data-th="Status: " class="priority-1">{{t.properties.Status}}</td>
+                  <td data-th="Distancia: " class="priority-1"></td>
+                  <td class="priority-1">
+                    <div class="btn-group-sm justify-content-between">
+                      <button  type="button" class="btn btn-dark" mdbWavesEffect >
+                        <i class="fas fa-file-signature"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <div class="form-group top-100">
+        <button type="button" class="btn btn-light" (click)="modal.close('Close click')" #closeLoginModal>Cancelar</button>
+      </div>
+    </div>
+  </div>
+</ng-template>

@@ -2,3 +2,6 @@
 <div class="map" id="mapa">
 
 </div>
+<label>Mostrar posición actual<input id="trackpos" type="checkbox" [(ngModel)]="isChecked" (change)="toggleGeolocation(isChecked)"/></label>
+<div  *ngIf='geolocationerror'>{{geolocationmsg}}</div>
+<div >{{geolocLiveCoords}}</div>
