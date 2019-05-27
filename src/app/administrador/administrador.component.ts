@@ -1,10 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {LoginService} from '../login/login.service';
 import {Router} from '@angular/router';
-import { NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
-import { getDistance} from 'ol/sphere';
-
-
+import {environment} from '../../environments/environment';
 
 @Component({
   selector: 'app-administrador',
@@ -13,75 +10,38 @@ import { getDistance} from 'ol/sphere';
 })
 export class AdministradorComponent implements OnInit {
   denuncias;
-  tecnicos;
   datos;
-  wId: string;
-  wCoord: string;
-  wDescription: string;
-  wStatus: string;
-  wDistance: string;
-  wAction: string;
-  modalReference: NgbModalRef;
-  puntoActual;
-
-  constructor(private loginService: LoginService, private router: Router, private modalService: NgbModal) {
-    // Se espera que los datos esten en formato GeoJSON
-    this.denuncias = this.loginService.getDenuncias();
-    this.wId = 'col-1';
-    this.wCoord = 'col-md-2';
-    this.wDescription = 'col-md-3';
-    this.wStatus = 'col-md-2';
-    this.wDistance = 'col-md-2';
-    this.wAction = 'col-md-2';
-
-    this.tecnicos = {
-      type: 'FeatureCollection',
-      features: [
-        {type: 'Feature', id: '2014', properties: { Nombre: 'Marisol Rodriguez', Status: 'Disponible'},
-          geometry: {type: 'Point', coordinates: [-99.1418708, 19.4440685]}},
-        {type: 'Feature', id: '0048', properties: { Nombre: 'Carlos Cortes', Status: 'Ocupado',},
-          geometry: {type: 'Point', coordinates: [-99.0500927, 19.559797]}},
-        {type: 'Feature', id: '4582', properties: { Nombre: 'Jorge Trejo', Status: 'Ocupado',},
-          geometry: {type: 'Point', coordinates: [-98.9352197, 19.835556]}},
-        {type: 'Feature', id: '5548', properties: { Nombre: 'Gilberto Rosas', Status: 'Disponible',},
-          geometry: {type: 'Point', coordinates: [-105.364325, 28.060944]}},
-      ]};
+  constructor(private loginService: LoginService, private router: Router) {
+    this.denuncias = [
+      {'Folio':15,'Coordenadas':'19.4440685, -99.1418708','Descripcion':'Fuga en tuberia','Status':'En proceso','Distancia':'verde','Accion':'true'},
+      {'Folio':17,'Coordenadas':'19.559797, -99.0500927','Descripcion':'Sabotaje','Status':'En proceso','Distancia':'amarillo','Accion':'true'},
+      {'Folio':21,'Coordenadas':'19.835556, -98.9352197','Descripcion':'Robo de combustible','Status':'Finalizado','Distancia':'rojo','Accion':'true'},
+      {'Folio':30,'Coordenadas':'28.060944, -105.364325','Descripcion':'Fuga en tuberia','Status':'En espera','Distancia':'amarillo','Accion':'true'},
+      {'Folio':42,'Coordenadas':'27.278238, -104.950253','Descripcion':'Robo de combustible','Status':'Sin asignar','Distancia':'rojo','Accion':'true'},
+      {'Folio':43,'Coordenadas':'25.761545, -108.814288','Descripcion':'Fuga en tuberia','Status':'En proceso','Distancia':'verde','Accion':'true'}
+    ];
   }
 
   ngOnInit() {
-    this.iniciarVariables();
-  }
-
-  openVerticallyCentered(content, denuncia) {
-    console.log(denuncia);
-    this.puntoActual = denuncia.geometry.coordinates;
-    this.modalReference = this.modalService.open(content, { centered: true, backdropClass: 'light-blue-backdrop', size: 'lg' });
-  }
-
-  iniciarVariables() {
     const token = this.loginService.obtenerToken();
-    this.loginService.setAccount(true);
     if (!token) {
-      this.loginService.setAccount(false);
-      console.log('No fue posible obtener token, redirigiendo');
       this.router.navigate(['']);
     }
-    // this.loginService.pedirDenuncias();
+    this.loginService.obtenerDatos().subscribe( datos => {
+      this.datos = datos;
+      console.log(this.datos);
+    }, (err: any) => {
+      const messageError = JSON.stringify(err.error.error);
+      console.log(messageError + ' = ' + environment.invalidToken + ' : ');
+      console.log(messageError.match(environment.invalidToken));
+      if (messageError.match(environment.invalidToken) !== null) {
+        console.log('Token invalido: ' + environment.invalidToken);
+        localStorage.removeItem('userAuth');
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+        this.router.navigate(['']);
+      }
+    });
   }
 
-  distancia(pt1, pt2) {
-    let dis = 0;
-    dis += getDistance(pt1, pt2, null);
-    let output;
-    if (dis > 1000) {
-      output = (Math.round(dis / 1000 * 100) / 100) +
-        ' ' + 'km';
-    } else {
-      output = (Math.round(dis * 100) / 100) +
-        ' ' + 'm';
-    }
-    return output;
-  }
 }
-
-
