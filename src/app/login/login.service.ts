@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import {environment} from '../../environments/environment';
 import { map } from 'rxjs/operators';
 import {Router} from '@angular/router';
+import {Denuncia} from '../denuncia';
 
 
 @Injectable()
@@ -10,26 +11,30 @@ export class LoginService {
   httpOptions: {};
   httpOptionsAuth: {};
   token;
-  myAccount: boolean;
-  denuncias;
+  denuncia;
 
-  constructor(private http: HttpClient, private router:Router) {
+  constructor(private http: HttpClient, private router: Router) {
     this.httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/x-www-form-urlencoded',
         Authorization: 'Basic ' + btoa(environment.userAuth + ':' + environment.passAuth),
       })
     };
-    this.token = this.obtenerToken();
+  //  this.token = this.obtenerToken();
   }
 
-  log(logUsuario, logContrasena) {
+  //Obtiene el token
+  log(usuario:string, contrasena:string) {
+
+    console.log("primer token "+this.httpOptions);
     const data = new URLSearchParams()
-    data.set('username', logUsuario);
-    data.set('password', logContrasena);
+    data.set('username', usuario);
+    data.set('password', contrasena);
     data.set('grant_type', 'password');
+    console.log(data);
     return this.http.post(environment.loginPoint, data.toString(), this.httpOptions).pipe(
       map(datos => {
+        console.log("datos para token "+datos);
         return datos;
       })
     );
@@ -41,6 +46,7 @@ export class LoginService {
     if (!token) {
       return null;
     }
+    console.log("token: "+token);
     return token;
   }
 
@@ -61,90 +67,48 @@ export class LoginService {
       })
     );
   }
-
-  obtenerDuctos() {
-    this.token = this.obtenerToken();
-    if (!this.token) {
-      return null;
-    }
-    this.httpOptionsAuth = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/x-www-form-urlencoded',
-        Authorization: 'Bearer ' + this.token,
-      })
-    };
-    return this.http.get(environment.ductosPoint, this.httpOptionsAuth).pipe(
-      map( datos => {
-        return datos;
-      })
-    );
-  }
-
-  setAccount(estado) {
-    // Guarda el estado de la página mi cuenta
-    this.myAccount = estado;
-  }
-
-  getAccount() {
-    // Indica si se esta en la página de mi cuenta o no
-    return this.myAccount;
-  }
-
-  finalizarSesion() {
-    localStorage.removeItem('userAuth');
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    this.setAccount(false);
-    this.router.navigate(['']);
-  }
-
-  pedirDenuncias() {
-    this.obtenerDatos().subscribe( datos => {
-      this.denuncias = {
-        "type": "FeatureCollection",
-        "features": []
-      };
-      for (const punto in datos) {
-        if (datos.hasOwnProperty(punto)) {
-          this.denuncias.features.push({
-            type: 'Feature',
-            geometry: {
-              type: 'Point',
-              coordinates: [datos[punto][0], datos[punto][0]]
-            },
-            properties: {Descripcion: 'Fuga en tuberia', Status: 'En proceso', Distancia: 'verde', Accion: 'true'}
-          });
-        }
-      }
-      return this.denuncias;
-    }, (err: any) => {
-      const messageError = JSON.stringify(err.error.error);
-      console.log(messageError + ' = ' + environment.invalidToken + ' : ');
-      console.log(messageError.match(environment.invalidToken));
-      if (messageError.match(environment.invalidToken) !== null) {
-        this.finalizarSesion();
+    obtenerDatosDenuncias(){
+      console.log("denuncias");
+      this.token = this.obtenerToken();
+      if (!this.token) {
         return null;
       }
-    });
-  }
+      this.httpOptionsAuth = {
+        headers: new HttpHeaders({
+          'Content-Type': 'application/x-www-form-urlencoded',
+          Authorization: 'Bearer ' + this.token,
+        })
+      };
+      return this.http.get(environment.mostrarDenuncia, this.httpOptionsAuth).pipe(
+        map( datos => {
+          return datos;
+        })
+      );
+    }
 
-  getDenuncias() {
-    this.denuncias = {
-      type: 'FeatureCollection',
-      features: [
-        {type: 'Feature', id: '15', properties: { Descripcion: 'Fuga en tuberia', Status: 'En proceso', Distancia: 'verde', Accion: 'true'},
-          geometry: {type: 'Point', coordinates: [-99.1418708, 19.4440685]}},
-        {type: 'Feature', id: '17', properties: { Descripcion: 'Sabotaje', Status: 'En proceso', Distancia: 'amarillo', Accion: 'true'},
-          geometry: {type: 'Point', coordinates: [-99.0500927, 19.559797]}},
-        {type: 'Feature', id: '21', properties: { Descripcion: 'Robo de combustible', Status: 'En espera', Distancia: 'rojo', Accion: 'true'},
-          geometry: {type: 'Point', coordinates: [-98.9352197, 19.835556]}},
-        {type: 'Feature', id: '30', properties: { Descripcion: 'Fuga en tuberia', Status: 'En espera', Distancia: 'amarillo', Accion: 'true'},
-          geometry: {type: 'Point', coordinates: [-105.364325, 28.060944]}},
-        {type: 'Feature', id: '42', properties: { Descripcion: 'Robo de combustible', Status: 'Sin asignar', Distancia: 'rojo', Accion: 'true'},
-          geometry: {type: 'Point', coordinates: [-104.950253, 27.278238]}},
-        {type: 'Feature', id: '43', properties: { Descripcion: 'Fuga en tubería', Status: 'En proceso', Distancia: 'verde', Accion: 'true'},
-          geometry: {type: 'Point', coordinates: [-108.814288, 25.761545]}},
-      ]};
-    return this.denuncias;
-  }
+    insertarDenuncia(denuncia: Denuncia){
+      console.log("denuncias insertar");
+      this.token = this.obtenerToken();
+      if (!this.token) {
+        return null;
+      }
+      this.httpOptions = {
+        headers: new HttpHeaders({
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + this.token,
+
+        })
+      };
+      const jsonDenuncia = JSON.stringify(denuncia);
+      console.log("DENUNCIA "+ jsonDenuncia);
+      return this.http.post(environment.crearDenuncia, jsonDenuncia, this.httpOptions).pipe(
+        map(datos => {
+          console.log("datos insertar "+datos);
+          return datos;
+        })
+      );
+    }
+
+
+
 }

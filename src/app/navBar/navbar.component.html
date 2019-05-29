@@ -1,41 +1,56 @@
 <!--Navbar-->
-<mdb-navbar SideClass="navbar navbar-expand-lg navbar-dark cyan" [containerInside]="false">
-
+<mdb-navbar SideClass="navbar fixed-top navbar-toggleable-md navbar-expand-lg navbar-dark black scrolling-navbar intro-fixed-nav" [containerInside]="false">
   <!-- Navbar brand -->
-  <mdb-navbar-brand><a class="navbar-brand" href="#">Killing-Huachicol</a></mdb-navbar-brand>
-
+  <mdb-navbar-brand>
+    <a class="logo navbar-brand" href="#"><strong>Killing - Huachicol</strong></a>
+  </mdb-navbar-brand>
   <!-- Collapsible content -->
   <links>
-
     <!-- Links -->
-    <ul class="navbar-nav ml-auto">
-      <li class="nav-item active">
-        <a class="nav-link waves-light" mdbWavesEffect><mdb-icon fas icon="envelope"></mdb-icon> Contacto<span class="sr-only">(current)</span></a>
+    <ul class="nav navbar-nav nav-flex-icons ml-auto ie-double-nav">
+      <li class="nav-item">
+        <a class="nav-link active waves-light" mdbWavesEffect href="#">
+          <mdb-icon fas icon="house-damage" size="lg" class="green-text pr-1" aria-hidden="true"></mdb-icon>
+          <span class="clearfix d-none d-sm-inline-block">Inicio</span>
+        </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link waves-light" mdbWavesEffect><mdb-icon fas icon="cog"></mdb-icon> Servicios</a>
+        <a class="nav-link waves-light" mdbWavesEffect href="#nosotros">
+          <mdb-icon fas icon="info-circle" size="lg" class="green-text pr-1" aria-hidden="true"></mdb-icon>
+          <span class="clearfix d-none d-sm-inline-block">Sobre Nosotros</span>
+        </a>
       </li>
-
+      <li class="nav-item">
+        <a class="nav-link waves-light" mdbWavesEffect href="#noticias">
+          <mdb-icon fas icon="newspaper" size="lg" class="green-text pr-1" aria-hidden="true"></mdb-icon>
+          <span class="clearfix d-none d-sm-inline-block">Noticias</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link waves-light" mdbWavesEffect href="#servicios">
+          <mdb-icon fas icon="cog" size="lg" class="green-text pr-1" aria-hidden="true"></mdb-icon>
+          <span class="clearfix d-none d-sm-inline-block">Servicios</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link waves-light" mdbWavesEffect href="#contacto">
+          <mdb-icon fas icon="envelope" size="lg" class="green-text pr-1" aria-hidden="true"></mdb-icon>
+          <span class="clearfix d-none d-sm-inline-block">Contacto</span>
+        </a>
+      </li>
       <!-- Dropdown -->
-      <li class="nav-item dropdown" dropdown>
-        <a dropdownToggle mdbWavesEffect type="button" class="nav-link dropdown-toggle waves-light" mdbWavesEffect>
-          <i class="fas fa-user-circle"></i>{{BotonPrincipal}}<span class="caret"></span></a>
-        <div *dropdownMenu class="dropdown-menu dropdown  dropdown-menu-right" role="menu">
-          <div *ngIf="!sesion">
-            <a class="dropdown-item waves-light" mdbWavesEffect ><app-login></app-login></a>
-            <a class="dropdown-item waves-light" mdbWavesEffect href="#">{{opcion2}} <i class="fas fa-user-plus"></i></a>
-          </div>
-          <div *ngIf="sesion">
-            <a *ngIf="!miCuenta" class="dropdown-item waves-light" mdbWavesEffect (click)="miPagina()">{{opcion4}} <i class="fas fa-home"></i></a>
-            <a class="dropdown-item waves-light" mdbWavesEffect href="#" (click)="finalizarSesion()">{{opcion3}} <i class="fas fa-sign-out-alt"></i></a>
-          </div>
+      <li class="nav-item dropdown btn-group" dropdown>
+        <a dropdownToggle type="button" class="nav-link dropdown-toggle waves-light" mdbWavesEffect>
+          <mdb-icon fas icon="user-circle" size="lg" class="green-text pr-1" aria-hidden="true"></mdb-icon>
+          <span class="clearfix d-none d-sm-inline-block">{{BotonPrincipal}}</span>
+        </a>
+        <div class="dropdown-menu dropdown-primary dropdown-menu-right" role="menu">
+          <app-login></app-login>
         </div>
       </li>
-
     </ul>
     <!-- Links -->
   </links>
   <!-- Collapsible content -->
-
 </mdb-navbar>
 <!--/.Navbar-->

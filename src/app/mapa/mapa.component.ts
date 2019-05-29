@@ -1,32 +1,13 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
+import 'ol/ol.css';
 import Map from 'ol/Map';
-import OlTileLayer from 'ol/layer/Tile';
-import Vector from 'ol/layer/Vector';
-import VectorLayer from 'ol/layer/Vector';
-import VectorSource from 'ol/source/Vector';
-import GeoJSON from 'ol/format/GeoJSON';
-import OlView from 'ol/View';
+import View from 'ol/View';
+import TileLayer from 'ol/layer/Tile';
 import OSM from 'ol/source/OSM';
-import FullScreen from 'ol/control/Fullscreen';
-import OverviewMap from 'ol/control/OverviewMap';
-import ScaleLine from 'ol/control/ScaleLine';
-import Style from 'ol/style/Style';
-import Stroke from 'ol/style/Stroke';
-import Icon from 'ol/style/Icon';
+import FullScreen from 'ol/control/FullScreen';
 import Geolocation from 'ol/Geolocation';
-import Feature from 'ol/Feature';
-import Fill from 'ol/style/Fill';
-import CircleStyle from 'ol/style/Circle';
-import Point from 'ol/geom/Point';
-
-
-import {LeerJSONService} from '../leer-json.service';
-
-import {LoginService} from '../login/login.service';
-import {environment} from '../../environments/environment';
-import LineString from 'ol/geom/LineString';
-
+import Overlay from 'ol/Overlay';
 
 
 @Component({
@@ -34,45 +15,71 @@ import LineString from 'ol/geom/LineString';
   templateUrl: './mapa.component.html',
   styleUrls: ['./mapa.component.css']
 })
-
 export class MapaComponent implements OnInit {
   map: Map;
+  view: View;
+  layer: TileLayer;
   source: OSM;
-  layer: OlTileLayer;
-  denunciaLayer: Vector;
-  denunciasGeojson;
-  ductosURL: Array<string>;
-  ductosGeojson;
-  ductosLayer: Vector;
-  view: OlView;
-  overviewView: OlView;
-  private geolocation: Geolocation;
-  geolocationerror: boolean;
-  geolocationmsg;
-  accuracyFeature: Feature;
-  positionFeature: Feature;
-  geolocsource: VectorSource;
-  geoloclayer: VectorLayer;
-  geolocLiveCoords;
-  @Input() isChecked: boolean;
-
-  constructor(private ljson: LeerJSONService, private loginService: LoginService) {
-    this.ductosURL = ['ductos.json', 'sistemaGuaymas.json', 'sistemaHobbs-Mendez.json', 'sistemaNorte.json',
-      'sistemaPetroquimico.json', 'sistemaProgreso.json', 'sistemaRosarito.json', 'sistemaSur-Golfo-Centro-Occidente.json',
-        'sistemaTopolobampo.json'
-    ];
-    this.isChecked = true;
-  }
+  control: FullScreen;
+  geolocation : Geolocation;
+  overlay : Overlay;
+  lng;
+  lat;
+  coordinate;
 
   ngOnInit() {
     this.initMap();
-    this.geoLocal();
   }
 
   initMap() {
+
+    this.view = new View({
+      center : [-99.1468518,19.5046539],
+      projection : 'EPSG:4326',
+      zoom : 13
+    });
+    this.source = new OSM();
+    this.layer = new TileLayer({
+      source: this.source
+    });
+
+
+    this.map = new Map({
+     target: 'mapa',
+     layers: [this.layer],
+     loadTilesWhileAnimating: true,
+     view: this.view
+   });
+
+    this.geolocation = new Geolocation({
+        tracking: true,
+        projection: 'EPSG:4326'
+    });
+    this.geolocation.once('change', function(evt) {
+      console.log(evt);
+      this.lng = evt.target.position_[1];
+      this.lat = evt.target.position_[0];
+      console.log("lat "+evt.target.lat+" lng "+evt.target.lng);
+      this.coordinate = evt.target.position_;
+      console.log("center "+this.coordinate);
+      this.overlay = new Overlay({
+        element: document.getElementById('marker'),
+        positioning: 'bottom-left',
+        stopEvent: true,
+        position: this.coordinate
+      });
+      console.log("ups "+this.coordinate);
+      this.view.setCenter();
+      this.map.setView(this.view);
+    });
+  }
+
+
+
+
     // No es necesaria la linea si se trabaja con EPSG: 4326 como proyeccion
     // var centro = ol.proj.fromLonLat([-100,21]);
-    this.view = new OlView({center: [-100, 21], zoom: 4, minZoom: 4, projection: 'EPSG:4326'});
+    /*this.view = new OlView({center: [-100, 21], zoom: 3, minZoom: 4, projection: 'EPSG:4326'});
     this.overviewView = new OlView({projection: 'EPSG:4326'});
     this.source = new OSM();
     this.layer = new OlTileLayer({
@@ -88,262 +95,57 @@ export class MapaComponent implements OnInit {
     this.map.addControl(new FullScreen());
     this.map.addControl(new OverviewMap({view: this.overviewView}));
     this.map.addControl(new ScaleLine());
-    this.cargarDuctos();
-    this.loginService.obtenerDatos().subscribe(datos => {
-      this.denunciasGeojson = {
-        type: 'FeatureCollection',
-        features: []
-      };
-      for (const punto in datos) {
-        if (datos.hasOwnProperty(punto)) {
-          this.denunciasGeojson.features.push({
-            type: 'Feature',
-            geometry: {
-              type: 'Point',
-              coordinates: [datos[punto][0], datos[punto][0]]
-            },
-            properties: {Descripcion: 'Fuga en tuberia', Status: 'En proceso', Distancia: 'verde', Accion: 'true'}
-          });
-        }
-      }
-      this.denunciasGeojson = this.loginService.getDenuncias();
-      // console.log(this.denunciasGeojson);
-      this.cargarDenuncias();
-    }, (err: any) => {
-      console.log(err);
-      const messageError = JSON.stringify(err.error.error);
-      console.log(messageError + ' = ' + environment.invalidToken + ' : ');
-      console.log(messageError.match(environment.invalidToken));
-      if (messageError.match(environment.invalidToken) !== null) {
-        this.loginService.finalizarSesion();
-      }
-    });
-  }
+    if(navigator.geolocation){
+      navigator.geolocation.getCurrentPosition(function(position){
+        this.lat = position.coords.latitude;
+        this.lng = position.coords.longitude;
+        this.coordenadas = transform(this.lng, this.lat);
+        this.map.setCenter(this.coordenadas,14);
+        this.markers = new OpenLayers.Layer.Markers("Marcas");
+        this.markers.addMarker(new OpenLayers.Marker(this.coordenadas));
+        this.map.addLayer(this.markers);
+        console.log(this.lat);
+      });
+    }*/
 
-  cargarDenuncias() {
-    const sourceDenuncia = new VectorSource({
-      features: (new GeoJSON()).readFeatures(this.denunciasGeojson)
-    });
-    const iconsrc = '/assets/img/oil-drop.png';
-    const sz = [.3, .4, .5, .8];
-    const icon = new Icon({
-      anchor: [0.5, 46],
-      anchorXUnits: 'fraction',
-      anchorYUnits: 'pixels',
-      opacity: 0.75,
-      src: iconsrc,
-      scale: sz[0]
-    });
-    const iconStyle = new Style({
-      image: icon
-    });
-    this.denunciaLayer = new Vector({
-      source: sourceDenuncia,
-      style: (feature, resolution) => {
-        const scale = this.tamano(resolution);
-        icon.setScale(sz[scale]);
-        return iconStyle;
-      }
-    });
-    this.map.addLayer(this.denunciaLayer);
-  }
-
-  geoLocal() {
-    this.geolocation = new Geolocation({
-      projection: 'EPSG: 4326',
-      tracking: true,
-      trackingOptions: {
-        enableHighAccuracy: true,
-        maximumAge: 2000
-      }
-    });
-
-    this.geolocation.on('error', (error) => {
-      this.geolocationerror = true;
-      this.geolocationmsg = error;
-    });
-
-    this.accuracyFeature = new Feature();
-    this.geolocation.on('change:accuracyGeometry', () => {
-      this.accuracyFeature.setGeometry(this.geolocation.getAccuracyGeometry());
-    });
-
-    this.positionFeature = new Feature();
-    this.positionFeature.setStyle(new Style({
-      image: new CircleStyle({
-        radius: 6,
-        fill: new Fill({
-          color: '#3399CC'
-        }),
-        stroke: new Stroke({
-          color: '#fff',
-          width: 2
-        })
-      })
-    }));
-    this.geolocation.on('change:position', () => {
-      const coordinates = this.geolocation.getPosition();
-      this.positionFeature.setGeometry(coordinates ?
-        new Point(coordinates) : null);
-    });
-
-    this.geolocsource = new VectorSource({});
-    this.geoloclayer = new VectorLayer({
-      source: this.geolocsource,
-    });
-  }
-
-  toggleGeolocation(checked) {
-    // erase any previous errors
-    this.geolocationmsg = '';
-    this.geolocationerror = false;
-    //// toggled on
-    if (checked) {
-      this.geolocation.setTracking(checked); // set on
-      this.geolocsource.addFeatures([this.accuracyFeature, this.positionFeature]) ;
-      const centerGeo = this.geolocation.getPosition();
-      // zoom there
-      if (centerGeo) {
-        this.map.addLayer(this.geoloclayer);
-        this.map.getView().animate({
-          center: centerGeo,
-          duration: 2000,
-          zoom: 16
-        });
-      }
-      // show the geolocation coords in html all the time
-      this.geolocLiveCoords = this.geolocation.getPosition();
-    } else { // geolocation off
-      this.geolocation.setTracking(checked);
-      this.geolocsource.clear();
-      this.geolocLiveCoords = '';
-      this.map.removeLayer(this.geoloclayer);
+ /* flyTo(location, done) {
+    const duration = 2000;
+    const view = map.getView();
+    let zoom = view.getZoom();
+    const mzoom = view.getMinZoom();
+    let zoom2 = mzoom;
+    if (zoom < 8) {
+      zoom2 = zoom - 1;
+      zoom = 7;
     }
-  }
-
-  tamano(resolusion) {
-    let sz;
-    // console.log(resolusion);
-    if (resolusion > .01) {
-      sz = 0;
-    } else if (resolusion > .0005) {
-      sz = 1;
-    } else if (resolusion > .00005) {
-      sz = 2;
-    } else {
-      sz = 3;
+    if (zoom > 10) {
+      zoom2 = zoom - 2;
     }
-    return sz;
-  }
-
-  cargarDuctos() {
-    let estilo;
-    const img = new Image();
-    img.src = '/assets/img/oil-pipe128.png';
-    img.onload = () => {
-      const tCnv = document.createElement('canvas');
-      const tCtx = tCnv.getContext('2d') as CanvasRenderingContext2D;
-      const cnv = document.createElement('canvas');
-      const ctx = cnv.getContext('2d') as CanvasRenderingContext2D;
-      const size = 5;
-      tCnv.width = size;
-      tCnv.height = size;
-      tCtx.rect(0, 0, size, size);
-      tCtx.fillStyle = 'rgba(100,100,100,0.3)';
-      tCtx.fill();
-      tCtx.drawImage(img, 0, 0, img.width, img.height, 0, 0, size, size);
-      const pattern = ctx.createPattern(tCnv, 'repeat');
-      const str = new Stroke();
-      str.setWidth(size);
-      str.setColor(pattern);
-      estilo = new Style({
-        stroke: str,
-      });
-    };
-    let sourceDuctos;
-    this.loginService.obtenerDuctos().subscribe(data => {
-      console.log('Ingresando a ductos');
-      const datos = JSON.stringify(data);
-      const datosJSON = JSON.parse(datos);
-      let vector = new VectorSource();
-      let line;
-      let points;
-      datosJSON.content.forEach(item => {
-        points = [];
-        for (const i of item.location.coordinates) {
-          points.push(i.coordinates);
-        }
-        line = new Feature({
-          geometry: new LineString(points)
-        });
-        vector.addFeature(line);
-      });
-      sourceDuctos = vector;
-      this.ductosLayer = new Vector({
-        source: sourceDuctos,
-        style: estilo
-      });
-      this.ductosLayer = new Vector({
-        source: sourceDuctos,
-        style: estilo
-      });
-      this.map.addLayer(this.ductosLayer);
-    }, () => {
-      console.log('Ductos locales');
-      this.ductosURL.forEach(url => {
-        this.ljson.getJSON('/ductos/' + url).subscribe(data => {
-          this.ductosGeojson = data;
-          sourceDuctos = new VectorSource({
-            features: (new GeoJSON()).readFeatures(this.ductosGeojson)
-          });
-          this.ductosLayer = new Vector({
-            source: sourceDuctos,
-            style: estilo
-          });
-          this.map.addLayer(this.ductosLayer);
-        });
-      });
-    });
-  }
-
-  /* flyTo(location, done) {
-     const duration = 2000;
-     const view = map.getView();
-     let zoom = view.getZoom();
-     const mzoom = view.getMinZoom();
-     let zoom2 = mzoom;
-     if (zoom < 8) {
-       zoom2 = zoom - 1;
-       zoom = 7;
-     }
-     if (zoom > 10) {
-       zoom2 = zoom - 2;
-     }
-     if (zoom > 14) {
-       zoom2 = zoom - 4;
-     }
-     let parts = 2;
-     let called = false;
-     function callback(complete) {
-       -- parts;
-       if (called) {
-         return;
-       }
-       if (parts === 0 || !complete) {
-         called = true;
-         done(complete);
-       }
-     }
-     view.animate({
-       center: location,
-       duration: duration
-     }, callback);
-     view.animate({
-       zoom: zoom2,
-       duration: duration / 2
-     }, {
-       zoom: zoom,
-       duration: duration / 2
-     }, callback);
-   }*/
+    if (zoom > 14) {
+      zoom2 = zoom - 4;
+    }
+    let parts = 2;
+    let called = false;
+    function callback(complete) {
+      -- parts;
+      if (called) {
+        return;
+      }
+      if (parts === 0 || !complete) {
+        called = true;
+        done(complete);
+      }
+    }
+    view.animate({
+      center: location,
+      duration: duration
+    }, callback);
+    view.animate({
+      zoom: zoom2,
+      duration: duration / 2
+    }, {
+      zoom: zoom,
+      duration: duration / 2
+    }, callback);
+  }*/
 }

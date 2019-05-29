@@ -6,12 +6,13 @@ export const environment = {
   production: false,
   loginPoint: 'https://auth-service-huachicol.herokuapp.com/oauth/token',
   reportPoint: 'https://complain-service-huachicol.herokuapp.com/api/v1/user/center/coordinates',
-  ductosPoint: 'https://complain-service-huachicol.herokuapp.com/api/v1/user/ductos/page/',
   userAuth: 'angularjwtclientid',
   passAuth: '12345',
   userRole: 'CIUDADANO_ROLE',
   adminRole: 'ADMINISTRADOR_ROLE',
-  invalidToken: 'invalid_token'
+  invalidToken: 'invalid_token',
+  crearDenuncia: 'https://complain-service-huachicol.herokuapp.com/api/v1/user/complain/',
+  mostrarDenuncia: 'https://complain-service-huachicol.herokuapp.com/api/v1/user/complains/1'
 };
 
 /*

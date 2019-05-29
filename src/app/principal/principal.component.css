@@ -1,0 +1,49 @@
+.view {
+    /*background: url("https://mdbootstrap.com/img/Photos/Others/img (50).jpg")no-repeat center center;*/
+    background: url("../../img/pemex/pemex.jpg")no-repeat center center;
+    background-size: cover;
+    height: 100vh;
+}
+
+#title{
+  text-align: left;
+  font-size: 450%;
+  padding-left: 30px;
+}
+#frase{
+  text-align: left;
+  font-size: 160%;
+  padding-left: 30px;
+}
+
+#intro{
+  text-align: justify;
+  font-size: 135%;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+#sendMessageButton{
+  background: #0000008a;
+
+}
+
+#nosotros, #servicios, #footer{
+  background: #8a3731;
+  padding-top:  60px;
+  padding-bottom: 60px;
+}
+
+#titulo-impar{
+  color: #F4976C;
+}
+
+#titulo-par{
+  color: white;
+}
+
+#noticias, #contacto{
+  background: #6c757dd9;
+  padding-top:  60px;
+  padding-bottom: 60px;
+}

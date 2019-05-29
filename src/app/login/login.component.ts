@@ -3,6 +3,7 @@ import { NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import { LoginService } from './login.service';
 import {Router} from '@angular/router';
 import {environment} from '../../environments/environment';
+import {NgForm } from '@angular/forms';
 
 @Component({
   selector: 'app-login',
@@ -17,6 +18,10 @@ export class LoginComponent implements OnInit {
   rolAdmin: string;
   cargando: boolean;
   modalReference: NgbModalRef;
+  sesion = false;
+  opcion1 = 'Iniciar sesión';
+  opcion2 = 'Registrarse';
+  opcion3 = 'Finalizar sesión';
 
 
   constructor(private modalService: NgbModal, private loginService: LoginService, private router: Router) {
@@ -30,13 +35,20 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit() {
+    if (this.loginService.obtenerToken() === null) {
+      this.sesion = false;
+    } else {
+      this.sesion = true;
+    }
+    console.log("segunda "+this.sesion);
+
   }
 
-  logIn(user, pass, event) {
+  logIn(username: string, password:string,event: Event) {
     event.preventDefault();
     this.cargando = true;
     (document.getElementById('logButton') as HTMLInputElement).disabled = true;
-    this.loginService.log(user, pass).subscribe(datos => {
+    this.loginService.log(username, password).subscribe(datos => {
       this.data = datos;
       const datosString = JSON.stringify(this.data);
       const datosJSON = JSON.parse(datosString);
@@ -46,19 +58,47 @@ export class LoginComponent implements OnInit {
       localStorage.setItem( 'userAuth', datosString);
       localStorage.setItem( 'token', token);
       localStorage.setItem( 'user', usuario);
-      if (usuario.match(this.rolAdmin) !== null) {
-        this.cargando = false;
-        (document.getElementById('logButton') as HTMLInputElement).disabled = false;
-        this.modalReference.close();
-        this.loginService.setAccount(true);
-        this.router.navigate(['admin']);
-      }
-    }, err => {
       this.cargando = false;
       (document.getElementById('logButton') as HTMLInputElement).disabled = false;
+      if (usuario.match(this.rolAdmin) != null) {
+        this.router.navigate(['admin']);
+        this.sesion = true;
+      }else if((usuario.match(this.rolUser) != null)){
+        this.router.navigate(['user']);
+        this.sesion = true;
+      }else{
+        this.router.navigate(['']);
+        this.sesion = false;
+      }
+    }, err => {
+      console.log(err);
     }, () => {
-      console.log('Finalizado inicio de sesion');
+      console.log('FInalizado inicio de sesion');
     });
+  }
+
+  logUsuario(username:string, password:string){
+    event.preventDefault();
+    this.cargando = true;
+    (document.getElementById('logButton') as HTMLInputElement).disabled = true;
+    //obtenemos token
+    this.loginService.log(username,password).subscribe(datos => {
+      this.data = datos;
+      const datosString = JSON.stringify(this.data);
+      const datosJSON = JSON.parse(datosString);
+      console.log("datos json "+datosJSON);
+
+    })
+  }
+
+  logOut(){
+    localStorage.removeItem("userAuth");
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    this.router.navigate(['']);
+    this.sesion = false;
+    console.log("final "+this.sesion);
+
   }
 
 }

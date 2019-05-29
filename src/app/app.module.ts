@@ -15,9 +15,21 @@ import { LoginComponent } from './login/login.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { MapaComponent } from './mapa/mapa.component';
-import {LeerJSONService} from './leer-json.service';
-import { FormsModule } from '@angular/forms';
 
+// Import ngx-twitter-timeline
+import { NgxTwitterTimelineModule } from 'ngx-twitter-timeline';
+
+import { FormsModule }   from '@angular/forms';
+
+
+import { ServiciosComponent } from './servicios/servicios.component';
+import { RealizarDenunciaComponent } from './modal/realizar-denuncia/realizar-denuncia.component';
+import { MostrarDenunciaComponent } from './modal/mostrar-denuncia/mostrar-denuncia.component';
+
+import {MostrarDenunciaService} from './modal/mostrar-denuncia/mostrar-denuncia.service';
+import {RealizarDenunciaService} from './modal/realizar-denuncia/realizar-denuncia.service';
+
+import {DatePipe} from '@angular/common';
 
 
 @NgModule({
@@ -26,7 +38,10 @@ import { FormsModule } from '@angular/forms';
     NavbarComponent,
     LoginComponent,
     MapaComponent,
-    routingComponents
+    routingComponents,
+    ServiciosComponent,
+    RealizarDenunciaComponent,
+    MostrarDenunciaComponent
   ],
   imports: [
     BrowserModule,
@@ -35,9 +50,11 @@ import { FormsModule } from '@angular/forms';
     NgbModule,
     HttpClientModule,
     BrowserAnimationsModule,
-    FormsModule
+    FormsModule,
+    // Specify library as an import
+    NgxTwitterTimelineModule
   ],
-  providers: [LoginService, LeerJSONService],
+  providers: [LoginService, MostrarDenunciaService, RealizarDenunciaService,  DatePipe],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
