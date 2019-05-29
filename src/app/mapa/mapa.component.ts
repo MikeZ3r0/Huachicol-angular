@@ -61,7 +61,7 @@ export class MapaComponent implements OnInit {
       'sistemaPetroquimico.json', 'sistemaProgreso.json', 'sistemaRosarito.json', 'sistemaSur-Golfo-Centro-Occidente.json',
         'sistemaTopolobampo.json'
     ];
-    this.isChecked = true;
+    this.isChecked = false;
   }
 
   ngOnInit() {
@@ -89,35 +89,8 @@ export class MapaComponent implements OnInit {
     this.map.addControl(new OverviewMap({view: this.overviewView}));
     this.map.addControl(new ScaleLine());
     this.cargarDuctos();
-    this.loginService.obtenerDatos().subscribe(datos => {
-      this.denunciasGeojson = {
-        type: 'FeatureCollection',
-        features: []
-      };
-      for (const punto in datos) {
-        if (datos.hasOwnProperty(punto)) {
-          this.denunciasGeojson.features.push({
-            type: 'Feature',
-            geometry: {
-              type: 'Point',
-              coordinates: [datos[punto][0], datos[punto][0]]
-            },
-            properties: {Descripcion: 'Fuga en tuberia', Status: 'En proceso', Distancia: 'verde', Accion: 'true'}
-          });
-        }
-      }
-      this.denunciasGeojson = this.loginService.getDenuncias();
-      // console.log(this.denunciasGeojson);
-      this.cargarDenuncias();
-    }, (err: any) => {
-      console.log(err);
-      const messageError = JSON.stringify(err.error.error);
-      console.log(messageError + ' = ' + environment.invalidToken + ' : ');
-      console.log(messageError.match(environment.invalidToken));
-      if (messageError.match(environment.invalidToken) !== null) {
-        this.loginService.finalizarSesion();
-      }
-    });
+    this.denunciasGeojson = this.loginService.getDenuncias();
+    this.cargarDenuncias();
   }
 
   cargarDenuncias() {
@@ -249,23 +222,22 @@ export class MapaComponent implements OnInit {
       tCnv.width = size;
       tCnv.height = size;
       tCtx.rect(0, 0, size, size);
-      tCtx.fillStyle = 'rgba(100,100,100,0.3)';
+      tCtx.fillStyle = 'rgba(200,200,200,0.3)';
       tCtx.fill();
       tCtx.drawImage(img, 0, 0, img.width, img.height, 0, 0, size, size);
       const pattern = ctx.createPattern(tCnv, 'repeat');
       const str = new Stroke();
       str.setWidth(size);
-      str.setColor(pattern);
+      // str.setColor(pattern);
       estilo = new Style({
         stroke: str,
       });
     };
     let sourceDuctos;
     this.loginService.obtenerDuctos().subscribe(data => {
-      console.log('Ingresando a ductos');
       const datos = JSON.stringify(data);
       const datosJSON = JSON.parse(datos);
-      let vector = new VectorSource();
+      const vector = new VectorSource();
       let line;
       let points;
       datosJSON.content.forEach(item => {
@@ -306,21 +278,29 @@ export class MapaComponent implements OnInit {
     });
   }
 
-  /* flyTo(location, done) {
-     const duration = 2000;
-     const view = map.getView();
-     let zoom = view.getZoom();
-     const mzoom = view.getMinZoom();
-     let zoom2 = mzoom;
-     if (zoom < 8) {
-       zoom2 = zoom - 1;
-       zoom = 7;
-     }
-     if (zoom > 10) {
-       zoom2 = zoom - 2;
-     }
-     if (zoom > 14) {
-       zoom2 = zoom - 4;
+  actualizar() {
+    this.denunciasGeojson = this.loginService.getDenuncias2();
+    this.map.removeLayer(this.denunciaLayer);
+    this.cargarDenuncias();
+  }
+
+  flyTo(location, done) {
+     let durationAnimation = 2000;
+     const view = this.map.getView();
+     let zoomMap = view.getZoom();
+     let zoom2 = view.getMinZoom();
+     if (zoomMap === 4) {
+       zoom2 = zoomMap;
+       zoomMap = 7;
+     } else if (zoomMap < 8) {
+       zoom2 = zoomMap - 1;
+     } else if (zoomMap < 14) {
+       zoom2 = zoomMap - 2;
+     } else if (zoomMap < 18) {
+       zoom2 = zoomMap - 6;
+     } else {
+       durationAnimation = 6000;
+       zoom2 = zoomMap - 10;
      }
      let parts = 2;
      let called = false;
@@ -336,14 +316,14 @@ export class MapaComponent implements OnInit {
      }
      view.animate({
        center: location,
-       duration: duration
+       duration: durationAnimation
      }, callback);
      view.animate({
        zoom: zoom2,
-       duration: duration / 2
+       duration: durationAnimation / 2
      }, {
-       zoom: zoom,
-       duration: duration / 2
+       zoom: zoomMap,
+       duration: durationAnimation / 2
      }, callback);
-   }*/
+   }
 }

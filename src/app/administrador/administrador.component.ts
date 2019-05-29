@@ -1,8 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {LoginService} from '../login/login.service';
 import {Router} from '@angular/router';
 import { NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import { getDistance} from 'ol/sphere';
+
+import { MapaComponent } from '../mapa/mapa.component';
 
 
 
@@ -14,7 +16,7 @@ import { getDistance} from 'ol/sphere';
 export class AdministradorComponent implements OnInit {
   denuncias;
   tecnicos;
-  datos;
+  sedena;
   wId: string;
   wCoord: string;
   wDescription: string;
@@ -23,6 +25,11 @@ export class AdministradorComponent implements OnInit {
   wAction: string;
   modalReference: NgbModalRef;
   puntoActual;
+  respuesta;
+  tituloSuccess: string;
+  mensaje: string;
+  success: boolean;
+  @ViewChild('mapa') mapa: MapaComponent;
 
   constructor(private loginService: LoginService, private router: Router, private modalService: NgbModal) {
     // Se espera que los datos esten en formato GeoJSON
@@ -33,28 +40,13 @@ export class AdministradorComponent implements OnInit {
     this.wStatus = 'col-md-2';
     this.wDistance = 'col-md-2';
     this.wAction = 'col-md-2';
-
-    this.tecnicos = {
-      type: 'FeatureCollection',
-      features: [
-        {type: 'Feature', id: '2014', properties: { Nombre: 'Marisol Rodriguez', Status: 'Disponible'},
-          geometry: {type: 'Point', coordinates: [-99.1418708, 19.4440685]}},
-        {type: 'Feature', id: '0048', properties: { Nombre: 'Carlos Cortes', Status: 'Ocupado',},
-          geometry: {type: 'Point', coordinates: [-99.0500927, 19.559797]}},
-        {type: 'Feature', id: '4582', properties: { Nombre: 'Jorge Trejo', Status: 'Ocupado',},
-          geometry: {type: 'Point', coordinates: [-98.9352197, 19.835556]}},
-        {type: 'Feature', id: '5548', properties: { Nombre: 'Gilberto Rosas', Status: 'Disponible',},
-          geometry: {type: 'Point', coordinates: [-105.364325, 28.060944]}},
-      ]};
   }
 
   ngOnInit() {
     this.iniciarVariables();
   }
 
-  openVerticallyCentered(content, denuncia) {
-    console.log(denuncia);
-    this.puntoActual = denuncia.geometry.coordinates;
+  openVerticallyCentered(content) {
     this.modalReference = this.modalService.open(content, { centered: true, backdropClass: 'light-blue-backdrop', size: 'lg' });
   }
 
@@ -66,7 +58,6 @@ export class AdministradorComponent implements OnInit {
       console.log('No fue posible obtener token, redirigiendo');
       this.router.navigate(['']);
     }
-    // this.loginService.pedirDenuncias();
   }
 
   distancia(pt1, pt2) {
@@ -82,6 +73,87 @@ export class AdministradorComponent implements OnInit {
     }
     return output;
   }
+
+  actualizarMapa(): void {
+    this.mapa.actualizar();
+  }
+
+  verPunto(punto) {
+    this.mapa.flyTo(punto, () => {});
+  }
+
+  actualizarTablaDenuncias() {
+  this.loginService.pedirDenuncias((status) => {
+    if (status) {
+      this.denuncias = this.loginService.getDenuncias2();
+      this.actualizarMapa();
+    }
+  });
+  }
+
+  tablaTecnicos(id, punto) {
+    this.loginService.pedirTecnicos((status) => {
+      if (status === true) {
+        this.tecnicos = this.loginService.getTecnicos();
+        this.puntoActual = punto;
+        this.openVerticallyCentered(id);
+      }
+    });
+  }
+
+  tablaSedena(id, punto) {
+    this.loginService.pedirSedena((status) => {
+      if (status === true) {
+        this.sedena = this.loginService.getSedena();
+        this.puntoActual = punto;
+        this.openVerticallyCentered(id);
+      }
+    });
+  }
+
+  enviarAsignacion(id, tipo, modal) {
+    const respuesta = {
+      type: 'Registro',
+      datos: [
+        {
+          type: 'Punto',
+          id: 'ID_CENTRO'
+        },
+        {
+          type: 'Asignado',
+          id: '(ID_PEMEX|ID_SEDENA)'
+        }
+      ],
+      destino: '(PEMEX|SEDENA)'
+    };
+    const respuesta1 = JSON.stringify(respuesta);
+    this.respuesta = JSON.parse(respuesta1);
+    this.respuesta.datos[0].id = this.puntoActual.id;
+    this.respuesta.datos[1].id = id.id;
+    this.loginService.asignacion(this.respuesta).subscribe(status => {
+      console.log(status);
+      this.mostrarMensaje('Asignación completa', 'Asignación completada con exito', true, modal, () => {});
+    }, error1 => {
+        this.mostrarMensaje('Asignación cancelada', 'La asignación no fue posible, accion cancelada, intente más tarde',
+          false, modal, () => {});
+        console.log(error1);
+        this.openVerticallyCentered('message');
+      }
+      );
+  }
+
+  mostrarMensaje(titulo, cuerpo, estado, modal, callback) {
+    this.mensaje = cuerpo;
+    this.tituloSuccess = titulo;
+    this.success = estado;
+    if (estado) {
+      this.modalReference.close();
+      this.actualizarTablaDenuncias();
+    }
+    this.openVerticallyCentered(modal);
+    callback(true);
+  }
+
 }
 
 

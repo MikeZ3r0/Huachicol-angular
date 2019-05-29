@@ -12,6 +12,8 @@ export class LoginService {
   token;
   myAccount: boolean;
   denuncias;
+  tecnicos;
+  sedena;
 
   constructor(private http: HttpClient, private router:Router) {
     this.httpOptions = {
@@ -98,8 +100,8 @@ export class LoginService {
     this.router.navigate(['']);
   }
 
-  pedirDenuncias() {
-    this.obtenerDatos().subscribe( datos => {
+  pedirDenuncias(callback) {
+    return this.obtenerDatos().subscribe( datos => {
       this.denuncias = {
         "type": "FeatureCollection",
         "features": []
@@ -110,13 +112,13 @@ export class LoginService {
             type: 'Feature',
             geometry: {
               type: 'Point',
-              coordinates: [datos[punto][0], datos[punto][0]]
+              coordinates: [datos[punto][0], datos[punto][1]]
             },
-            properties: {Descripcion: 'Fuga en tuberia', Status: 'En proceso', Distancia: 'verde', Accion: 'true'}
+            properties: {Fecha: '', Status: 'Sin asignar', Distancia: 200, Pemex: false, SEDENA: false}
           });
         }
       }
-      return this.denuncias;
+      callback(true);
     }, (err: any) => {
       const messageError = JSON.stringify(err.error.error);
       console.log(messageError + ' = ' + environment.invalidToken + ' : ');
@@ -128,23 +130,92 @@ export class LoginService {
     });
   }
 
+  getDenuncias2() {
+    return this.denuncias;
+  }
+
   getDenuncias() {
     this.denuncias = {
       type: 'FeatureCollection',
       features: [
-        {type: 'Feature', id: '15', properties: { Descripcion: 'Fuga en tuberia', Status: 'En proceso', Distancia: 'verde', Accion: 'true'},
+        {type: 'Feature', id: '15', properties: { Fecha: '', Status: 'En proceso', Distancia: 1000, Pemex: true, SEDENA: false},
           geometry: {type: 'Point', coordinates: [-99.1418708, 19.4440685]}},
-        {type: 'Feature', id: '17', properties: { Descripcion: 'Sabotaje', Status: 'En proceso', Distancia: 'amarillo', Accion: 'true'},
+        {type: 'Feature', id: '17', properties: { Fecha: '', Status: 'En proceso', Distancia: 700, Pemex: true, SEDENA: false},
           geometry: {type: 'Point', coordinates: [-99.0500927, 19.559797]}},
-        {type: 'Feature', id: '21', properties: { Descripcion: 'Robo de combustible', Status: 'En espera', Distancia: 'rojo', Accion: 'true'},
+        {type: 'Feature', id: '21', properties: { Fecha: '', Status: 'En espera', Distancia: 1500, Pemex: false, SEDENA: true},
           geometry: {type: 'Point', coordinates: [-98.9352197, 19.835556]}},
-        {type: 'Feature', id: '30', properties: { Descripcion: 'Fuga en tuberia', Status: 'En espera', Distancia: 'amarillo', Accion: 'true'},
+        {type: 'Feature', id: '30', properties: { Fecha: '', Status: 'En espera', Distancia: 600, Pemex: true, SEDENA: false},
           geometry: {type: 'Point', coordinates: [-105.364325, 28.060944]}},
-        {type: 'Feature', id: '42', properties: { Descripcion: 'Robo de combustible', Status: 'Sin asignar', Distancia: 'rojo', Accion: 'true'},
+        {type: 'Feature', id: '42', properties: { Fecha: '', Status: 'Sin asignar', Distancia: 1800, Pemex: false, SEDENA: false},
           geometry: {type: 'Point', coordinates: [-104.950253, 27.278238]}},
-        {type: 'Feature', id: '43', properties: { Descripcion: 'Fuga en tubería', Status: 'En proceso', Distancia: 'verde', Accion: 'true'},
-          geometry: {type: 'Point', coordinates: [-108.814288, 25.761545]}},
+        {type: 'Feature', id: '43', properties: { Fecha: '', Status: 'En proceso', Distancia: 300, Pemex: true, SEDENA: true},
+          geometry: {type: 'Point', coordinates: [-108.814288, 25.761545]}}
       ]};
     return this.denuncias;
+  }
+
+  pedirTecnicos(callback) {
+    this.tecnicos = {
+      type: 'FeatureCollection',
+      features: [
+        {type: 'Feature', id: '2014', properties: { Nombre: 'Marisol Rodriguez', Status: 'Disponible'},
+          geometry: {type: 'Point', coordinates: [-99.1418708, 19.4440685]}},
+        {type: 'Feature', id: '0048', properties: { Nombre: 'Carlos Cortes', Status: 'Ocupado'},
+          geometry: {type: 'Point', coordinates: [-99.0500927, 19.559797]}},
+        {type: 'Feature', id: '4582', properties: { Nombre: 'Jorge Trejo', Status: 'Ocupado'},
+          geometry: {type: 'Point', coordinates: [-98.9352197, 19.835556]}},
+        {type: 'Feature', id: '5548', properties: { Nombre: 'Gilberto Rosas', Status: 'Disponible'},
+          geometry: {type: 'Point', coordinates: [-105.364325, 28.060944]}},
+      ]};
+    callback(true);
+  }
+
+  getTecnicos() {
+    return this.tecnicos;
+  }
+
+  pedirSedena(callback) {
+    this.sedena = {
+      type: 'FeatureCollection',
+      features: [
+        {type: 'Feature', id: '666', properties: { Status: 'Disponible'},
+          geometry: {type: 'Point', coordinates: [-99.1418708, 19.4440685]}},
+        {type: 'Feature', id: '999', properties: { Status: 'Ocupado'},
+          geometry: {type: 'Point', coordinates: [-99.0500927, 19.559797]}},
+        {type: 'Feature', id: '696', properties: { Status: 'Ocupado'},
+          geometry: {type: 'Point', coordinates: [-98.9352197, 19.835556]}},
+        {type: 'Feature', id: '911', properties: { Status: 'Disponible'},
+          geometry: {type: 'Point', coordinates: [-105.364325, 28.060944]}},
+      ]};
+    callback(true);
+  }
+
+  getSedena() {
+    return this.sedena;
+  }
+
+  asignacion(content) {
+    this.token = this.obtenerToken();
+    if (!this.token) {
+      return null;
+    }
+    this.httpOptionsAuth = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Authorization: 'Bearer ' + this.token,
+      })
+    };
+    /*
+    return this.http.post(environment.assignPoint, JSON.stringify(content), this.httpOptionsAuth).pipe(
+      map( datos => {
+        return datos;
+      })
+    );*/
+
+    return this.http.get(environment.ductosPoint, this.httpOptionsAuth).pipe(
+      map( datos => {
+        return datos;
+      })
+    );
   }
 }
