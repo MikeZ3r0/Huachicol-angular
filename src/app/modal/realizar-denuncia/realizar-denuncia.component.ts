@@ -50,8 +50,10 @@ export class RealizarDenunciaComponent implements OnInit {
       this.realizarDenunciaService.setDenuncia(this.denuncia).subscribe( datos => {
         const dato = datos;
         console.log("denuncias "+dato);
-      }, (err: any) => {
-        const messageError = JSON.stringify(err.error.error);
+      }, err => {
+
+        console.error(err);
+        /*const messageError = JSON.stringify(err.error.error);
         console.log(messageError + ' = ' + environment.invalidToken + ' : ');
         console.log(messageError.match(environment.invalidToken));
         if (messageError.match(environment.invalidToken) !== null) {
@@ -59,9 +61,9 @@ export class RealizarDenunciaComponent implements OnInit {
           localStorage.removeItem('userAuth');
           localStorage.removeItem('user');
           localStorage.removeItem('token');
-          this.router.navigate(['']);
+          this.router.navigate(['']);*/
         }
-      });
+      );
 
       /*f.reset();*/
     }

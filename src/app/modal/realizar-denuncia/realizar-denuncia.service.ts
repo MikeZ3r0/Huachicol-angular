@@ -9,10 +9,12 @@ import { Observable, throwError } from 'rxjs';
 
 @Injectable()
 export class RealizarDenunciaService {
-  httpOptions: {};
+  private httpHeaders = new HttpHeaders().set('Content-Type', 'application/json');
   token;
+  public url : string;
 
   constructor(private http: HttpClient, private router: Router) {
+    this.url = environment.crearDenuncia;
   }
 
   getToken(){
@@ -25,23 +27,25 @@ export class RealizarDenunciaService {
   }
 
 
-  setDenuncia(denuncia: Denuncia){
+  setDenuncia(denuncia: Denuncia): Observable<any>{
     console.log("denuncias insertar");
     this.token = this.getToken();
-    this.httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + this.token
-      })
-    };
-    const jsonDenuncia = JSON.stringify(denuncia);
-    console.log("DENUNCIA "+ jsonDenuncia);
-    return this.http.post(environment.crearDenuncia, jsonDenuncia, this.httpOptions).pipe(
+    if (!this.token) {
+      return null;
+    }
+console.log("token realizar denuncia service: "+this.token);
+    this.httpHeaders.set('Authorization','Bearer ' + this.token );
+
+    //const jsonDenuncia = JSON.stringify(denuncia);
+    //console.log("DENUNCIA "+ jsonDenuncia+ "token"+this.httpHeaders);
+    return this.http.put(this.url, denuncia, {headers:this.httpHeaders}).pipe(
       map(datos => {
-        console.log("datos insertar "+datos);
-        return datos;
+        console.log("datos post "+datos);
       }),
-      catchError(this.handleError)
+      catchError(e=>{
+        console.log("post");
+        return throwError(e);
+      })
     );
   }
 
