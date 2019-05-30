@@ -3,6 +3,7 @@ import { NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import { LoginService } from './login.service';
 import {Router} from '@angular/router';
 import {environment} from '../../environments/environment';
+import {NgForm } from '@angular/forms';
 
 @Component({
   selector: 'app-login',
@@ -17,26 +18,35 @@ export class LoginComponent implements OnInit {
   rolAdmin: string;
   cargando: boolean;
   modalReference: NgbModalRef;
+  opcion1: string;
+  opcion2: string;
+  opcion3: string;
+  sesion: boolean;
 
 
   constructor(private modalService: NgbModal, private loginService: LoginService, private router: Router) {
     this.rolAdmin = environment.adminRole;
     this.rolUser = environment.userRole;
     this.cargando = false;
-  }
-
-  openVerticallyCentered(content) {
-    this.modalReference = this.modalService.open(content, { centered: true, backdropClass: 'light-blue-backdrop' });
+    this.opcion1 = 'Iniciar sesión';
+    this.opcion2 = 'Registrarse';
+    this.opcion3 = 'Finalizar sesión';
+    this.sesion = false;
   }
 
   ngOnInit() {
+    if (this.loginService.obtenerToken() === null) {
+      this.sesion = false;
+    } else {
+      this.sesion = true;
+    }
   }
 
-  logIn(user, pass, event) {
+  logIn(username: string, password: string, event: Event) {
     event.preventDefault();
     this.cargando = true;
     (document.getElementById('logButton') as HTMLInputElement).disabled = true;
-    this.loginService.log(user, pass).subscribe(datos => {
+    this.loginService.log(username, password).subscribe(datos => {
       this.data = datos;
       const datosString = JSON.stringify(this.data);
       const datosJSON = JSON.parse(datosString);
@@ -52,13 +62,41 @@ export class LoginComponent implements OnInit {
         this.modalReference.close();
         this.loginService.setAccount(true);
         this.router.navigate(['admin']);
+      } else if ((usuario.match(this.rolUser) !== null)) {
+        this.router.navigate(['user']);
+        this.sesion = true;
+      } else {
+        this.router.navigate(['']);
+        this.sesion = false;
       }
     }, err => {
       this.cargando = false;
       (document.getElementById('logButton') as HTMLInputElement).disabled = false;
+      console.log(err);
     }, () => {
       console.log('Finalizado inicio de sesion');
     });
   }
 
+  logOut() {
+    this.loginService.finalizarSesion();
+    this.sesion = false;
+    this.router.navigate(['']);
+  }
+
+  miPagina() {
+    const usuario = localStorage.getItem('user');
+    if (!usuario) {
+      this.logOut();
+    } else {
+      this.loginService.setAccount(true);
+      if (usuario.match(environment.adminRole) !== null) {
+        this.router.navigate(['admin']);
+      } else if (usuario.match(environment.userRole) !== null) {
+        this.router.navigate(['user']);
+      } else {
+        this.router.navigate(['']);
+      }
+    }
+  }
 }

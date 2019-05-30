@@ -1,0 +1,32 @@
+<ng-container *ngIf="sesion; then servicio; else noSesion">
+</ng-container>
+<ng-template #servicio >
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-6 text-justify">
+        <a href="#"></a>
+        <div>
+          <mdb-icon fas icon="edit" size="3x" class="yellow-text pr-3" aria-hidden="true"></mdb-icon>
+        </div>
+        <br>
+        <h4><strong>Realizar una denuncia</strong></h4>
+        <br>
+        <p class="resumen">NO tengas miedo, todas las denuncias son anonimas y fáciles de realizar.</p>
+        <app-realizar-denuncia></app-realizar-denuncia>
+      </div>
+      <div class="col-lg-6 text-justify">
+        <div>
+          <mdb-icon fas icon="file-alt" size="3x" class="yellow-text pr-1" aria-hidden="true"></mdb-icon>
+        </div>
+        <br>
+        <h4><strong>Seguimiento de mis denuncias</strong></h4>
+        <br>
+        <p class="resumen">Si ya denunciaste, conoce el estatus de cada una de tus denuncias.</p>
+        <app-mostrar-denuncia></app-mostrar-denuncia>
+      </div>
+    </div>
+  </div>
+</ng-template>
+<ng-template #noSesion>
+  <p>Inicia sesión para utilizar nuestros servicios</p>
+</ng-template>

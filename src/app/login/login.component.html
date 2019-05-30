@@ -1,46 +1,68 @@
-<ng-template #content let-modal>
+<ng-container *ngIf="sesion; then finalizarSesion; else iniciarSesion">
+</ng-container>
+
+<ng-template #finalizarSesion let-modal>
+  <a class="dropdown-item waves-light " mdbWavesEffect (click)="miPagina()">
+    <mdb-icon fas icon="sign-out-alt" size="lg" class="green-text pr-1" ></mdb-icon>
+    <span class="clearfix d-none d-sm-inline-block">Mi página</span>
+  </a>
+  <a class="dropdown-item waves-light " mdbWavesEffect (click)="logOut()">
+    <mdb-icon fas icon="sign-out-alt" size="lg" class="green-text pr-1" ></mdb-icon>
+    <span class="clearfix d-none d-sm-inline-block">{{opcion3}}</span>
+  </a>
+</ng-template>
+
+<ng-template #iniciarSesion let-modal>
   <div class="modal-header">
     <h4 class="modal-title">Iniciar sesion</h4>
-    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+    <button type="button" class="close" aria-label="Close" >
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
   <div class="modal-body">
+    <div class="col-lg-12 mx-auto">
+      <form  class="form">
+        <div class="control-group">
+          <div class="form-group floating-label-form-group controls mb-0 pb-2">
+            <input class="form-control" #username name="username" id="username" type="text" placeholder="Username" required="required" data-validation-required-message="Ingrese su usuario.">
+            <!--p class="help-block text-danger"></p-->
+          </div>
+        </div>
+        <div class="control-group">
+          <div class="form-group floating-label-form-group controls mb-0 pb">
+            <input class="form-control" #password name="password" id="password" type="password" placeholder="Password" required="required" data-validation-required-message="Ingrese una contraseña.">
+            <!--p class="help-block text-danger"></p-->
+          </div>
+        </div>
+        <br>
+        <div id="successlog"></div>
+      </form>
+    </div>
+  </div>
+  <div class="modal-footer">
     <div class="container">
-      <div class="row">
-        <div class="col-lg-12 mx-auto">
-          <form name="sentLog" id="log" novalidate="novalidate">
-            <div class="control-group">
-              <div class="form-group floating-label-form-group controls mb-0 pb-2">
-                <input class="form-control" #username name="username" id="username" type="text" placeholder="Username" required="required" data-validation-required-message="Ingrese su usuario.">
-                <p class="help-block text-danger"></p>
-              </div>
-            </div>
-            <div class="control-group">
-              <div class="form-group floating-label-form-group controls mb-0 pb-2">
-                <input class="form-control" #password name="password" id="pass" type="password" placeholder="Password" required="required" data-validation-required-message="Ingrese una contraseña.">
-                <p class="help-block text-danger"></p>
-              </div>
-            </div>
-            <br>
-            <div id="successlog"></div>
-          </form>
+      <div class="row col-*-*">
+        <div class="form-group top-100">
+          <button type="submit" class="btn btn-light btn-xl" id="logButton" (click)="logIn(username.value, password.value, $event)">
+            <i [ngClass]="{'fa-sign-in-alt':!cargando, 'fa-sync': cargando}" class="fas"></i>
+            <span *ngIf="!cargando">Ingresar</span>
+            <span *ngIf="cargando">Validando</span>
+          </button>
+          <button type="button" class="btn btn-light" ng-click="dropdownIsOpen = false" #closeLoginModal>Cerrar</button>
+        </div>
+      </div>
+      <div class="row col-*-*">
+        <div class="form-group">
+          <a class="dropdown-item waves-light" mdbWavesEffect href="#">
+            <mdb-icon fas icon="user-plus" size="lg" class="green-text pr-1" aria-hidden="true"></mdb-icon>
+            {{opcion2}}
+          </a>
         </div>
       </div>
     </div>
   </div>
-  <div class="modal-footer">
-    <div class="form-group top-100">
-      <button type="submit" class="btn btn-light btn-xl" id="logButton" (click)="logIn(username.value, password.value, $event)">
-        <i [ngClass]="{'fa-sign-in-alt':!cargando, 'fa-sync': cargando}" class="fas"></i>
-        <span *ngIf="!cargando">Ingresar</span>
-        <span *ngIf="cargando">Validando</span>
-      </button>
-      <button type="button" class="btn btn-light" (click)="modal.close('Close click')" #closeLoginModal>Cerrar</button>
-    </div>
-
-  </div>
 </ng-template>
 
 
-<button class="login waves-light" (click)="openVerticallyCentered(content)">Iniciar sesion <i class="fas fa-user-shield"></i></button>
+
+<!--button class="login waves-light" >Iniciar sesion</button-->

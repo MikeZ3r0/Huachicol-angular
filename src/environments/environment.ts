@@ -12,7 +12,9 @@ export const environment = {
   passAuth: '12345',
   userRole: 'CIUDADANO_ROLE',
   adminRole: 'ADMINISTRADOR_ROLE',
-  invalidToken: 'invalid_token'
+  invalidToken: 'invalid_token',
+  crearDenuncia: 'https://complain-service-huachicol.herokuapp.com/api/v1/user/complain/',
+  mostrarDenuncia: 'https://complain-service-huachicol.herokuapp.com/api/v1/user/complains/1'
 };
 
 /*
