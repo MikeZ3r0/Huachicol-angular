@@ -88,9 +88,12 @@ export class MapaComponent implements OnInit {
     this.map.addControl(new FullScreen());
     this.map.addControl(new OverviewMap({view: this.overviewView}));
     this.map.addControl(new ScaleLine());
-    this.cargarDuctos();
-    this.denunciasGeojson = this.loginService.getDenuncias();
-    this.cargarDenuncias();
+    const user = localStorage.getItem('user');
+    if (user.match(environment.adminRole) !== null) {
+      this.cargarDuctos();
+      this.denunciasGeojson = this.loginService.getDenuncias();
+      this.cargarDenuncias();
+    }
   }
 
   cargarDenuncias() {

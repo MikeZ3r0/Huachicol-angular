@@ -4,18 +4,21 @@ import {environment} from '../../../environments/environment';
 import { map, catchError } from 'rxjs/operators';
 import {Router} from '@angular/router';
 import {Denuncia} from '../../denuncia';
-import { throwError } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
+
 
 
 @Injectable()
 export class RealizarDenunciaService {
-  httpOptions: {};
+  private httpHeaders = new HttpHeaders().set('Content-Type', 'application/json');
   token;
+  public url: string;
 
   constructor(private http: HttpClient, private router: Router) {
+    this.url = environment.crearDenuncia;
   }
 
-  getToken() {
+  getToken(){
     this.token = localStorage.getItem('token');
     if (!this.token) {
       return null;
@@ -24,23 +27,32 @@ export class RealizarDenunciaService {
   }
 
 
-  setDenuncia(denuncia: Denuncia) {
+  setDenuncia(denuncia: Denuncia): Observable<any>{
     console.log('denuncias insertar');
     this.token = this.getToken();
-    this.httpOptions = {
+    if (!this.token) {
+      return null;
+    }
+    this.httpHeaders.set('Authorization', 'Bearer ' + this.token );
+    const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + this.token
+        Authorization: 'Bearer ' + this.token,
       })
     };
-    const jsonDenuncia = JSON.stringify(denuncia);
-    console.log('DENUNCIA ' + jsonDenuncia);
-    return this.http.post(environment.crearDenuncia, jsonDenuncia, this.httpOptions).pipe(
+    console.log('denuncia ' + JSON.stringify(denuncia));
+    console.log(httpOptions);
+    console.log({headers: this.httpHeaders});
+    // const jsonDenuncia = JSON.stringify(denuncia);
+    // console.log("DENUNCIA "+ jsonDenuncia+ "token"+this.httpHeaders);
+    return this.http.post(this.url, JSON.stringify(denuncia), httpOptions).pipe(
       map(datos => {
-        console.log('datos insertar ' + datos);
-        return datos;
+        console.log('datos post ' , datos);
       }),
-      catchError(this.handleError)
+      catchError(e => {
+        console.log('post');
+        return throwError(e);
+      })
     );
   }
 
@@ -61,4 +73,5 @@ export class RealizarDenunciaService {
     return throwError(
       'Something bad happened; please try again later.');
   }
+
 }

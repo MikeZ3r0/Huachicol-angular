@@ -2,10 +2,10 @@ import { Component, OnInit} from '@angular/core';
 import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
 import {Denuncia} from '../../denuncia';
 import {NgForm } from '@angular/forms';
-import {environment} from '../../../environments/environment';
 
 import {RealizarDenunciaService} from './realizar-denuncia.service';
-
+import {DatePipe} from '@angular/common';
+import {formatDate} from '@angular/common';
 
 import {Router} from '@angular/router';
 
@@ -17,17 +17,25 @@ import {Router} from '@angular/router';
 })
 export class RealizarDenunciaComponent implements OnInit {
   closeResult: string;
-  model = new Denuncia('Robo de combustible', 'Gente cavando cerca de ducto de Pemex');
-  denuncia;
-  constructor(private modalService: NgbModal, public realizarDenunciaService: RealizarDenunciaService,
-              private router: Router) {}
+  model: Denuncia;
+  denuncia: Denuncia;
+  sesion: boolean;
+
+
+
+  constructor(
+    private modalService: NgbModal, public realizarDenunciaService: RealizarDenunciaService,
+    private router: Router, public datePipe: DatePipe) {
+      this.sesion = false;
+      this.model = new Denuncia('Robo de combustible', 'Gente cavando');
+  }
 
   ngOnInit() {
     const token = this.realizarDenunciaService.getToken();
     if (!token) {
       this.router.navigate(['']);
     }
-
+    this.sesion = true;
   }
 
   open(content) {
@@ -45,24 +53,28 @@ export class RealizarDenunciaComponent implements OnInit {
     console.log('entre a denuncia');
     console.log(f.value);
     const today = new Date();
-    const date = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    // const date = this.datePipe.transform(today, 'yyyy-MM-dd'T'HH:mm:ss.SSSZ');
+    const date = formatDate(today, "yyyy-MM-dd'T'HH:mm:ss.mmmZ", 'en');
     console.log('datesss: ' + date);
-    this.denuncia = new Denuncia(f.value.titulo, f.value.descripcion, date ,
-      {x: 99.1468518, y: 19.5046539, coordinates: [-99.1468518, 19.5046539], type: 'Point'}, '1');
+    this.denuncia = new Denuncia(f.value.titulo, f.value.descripcion,
+      new Date(date) , {x: 99.1468518, y: 19.5046539, coordinates: [-99.1468518, 19.5046539], type: 'Point'}, '1');
     this.realizarDenunciaService.setDenuncia(this.denuncia).subscribe( datos => {
-      console.log('denuncias ' + datos);
-    }, (err: any) => {
-      const messageError = JSON.stringify(err.error.error);
-      console.log(messageError + ' = ' + environment.invalidToken + ' : ');
-      console.log(messageError.match(environment.invalidToken));
-      if (messageError.match(environment.invalidToken) !== null) {
-        console.log('Token invalido: ' + environment.invalidToken);
-        localStorage.removeItem('userAuth');
-        localStorage.removeItem('user');
-        localStorage.removeItem('token');
-        this.router.navigate(['']);
+        const dato = datos;
+        console.log('denuncias ' + dato);
+      }, err => {
+
+        console.error(err);
+        /*const messageError = JSON.stringify(err.error.error);
+        console.log(messageError + ' = ' + environment.invalidToken + ' : ');
+        console.log(messageError.match(environment.invalidToken));
+        if (messageError.match(environment.invalidToken) !== null) {
+          console.log('Token invalido: ' + environment.invalidToken);
+          localStorage.removeItem('userAuth');
+          localStorage.removeItem('user');
+          localStorage.removeItem('token');
+          this.router.navigate(['']);*/
       }
-    });
+    );
 
     /*f.reset();*/
   }
