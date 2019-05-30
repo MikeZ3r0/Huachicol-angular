@@ -3,7 +3,7 @@ import { NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import { LoginService } from './login.service';
 import {Router} from '@angular/router';
 import {environment} from '../../environments/environment';
-import {NgForm } from '@angular/forms';
+import decode from 'jwt-decode';
 
 @Component({
   selector: 'app-login',
@@ -59,7 +59,6 @@ export class LoginComponent implements OnInit {
       if (usuario.match(this.rolAdmin) !== null) {
         this.cargando = false;
         (document.getElementById('logButton') as HTMLInputElement).disabled = false;
-        this.modalReference.close();
         this.loginService.setAccount(true);
         this.router.navigate(['admin']);
       } else if ((usuario.match(this.rolUser) !== null)) {
