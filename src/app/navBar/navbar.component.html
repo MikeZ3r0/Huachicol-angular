@@ -47,7 +47,24 @@
           <span class="clearfix d-none d-sm-inline-block">{{BotonPrincipal}}</span>
         </a>
         <div class="dropdown-menu dropdown-primary dropdown-menu-right" role="menu" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()">
-          <app-login></app-login>
+          <ng-container *ngIf="sesion; then finalizarSesion; else iniciarSesion">
+          </ng-container>
+
+          <ng-template #iniciarSesion>
+            <app-login></app-login>
+            <app-registro-usuario></app-registro-usuario>
+          </ng-template>
+
+          <ng-template #finalizarSesion>
+            <a class="dropdown-item waves-light " mdbWavesEffect (click)="miPagina()">
+              <mdb-icon fas icon="sign-out-alt" size="lg" class="green-text pr-1" ></mdb-icon>
+              <span class="clearfix d-none d-sm-inline-block">Mi página</span>
+            </a>
+            <a class="dropdown-item waves-light " mdbWavesEffect (click)="logOut()">
+              <mdb-icon fas icon="sign-out-alt" size="lg" class="green-text pr-1" ></mdb-icon>
+              <span class="clearfix d-none d-sm-inline-block">Salir</span>
+            </a>
+          </ng-template>
         </div>
       </li>
     </ul>
