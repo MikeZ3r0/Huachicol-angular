@@ -14,7 +14,8 @@ export const environment = {
   adminRole: 'ADMINISTRADOR_ROLE',
   invalidToken: 'invalid_token',
   crearDenuncia: 'https://complain-service-huachicol.herokuapp.com/api/v1/user/complain/',
-  mostrarDenuncia: 'https://complain-service-huachicol.herokuapp.com/api/v1/user/complains/1'
+  mostrarDenuncia: 'https://damp-ocean-98658.herokuapp.com/api/v1/user/complains/',
+  registroUsuario: 'https://auth-service-huachicol.herokuapp.com/api/v1/ciudadano'
 };
 
 /*
