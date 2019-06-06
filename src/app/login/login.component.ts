@@ -1,9 +1,10 @@
 import { Component, OnInit, ViewEncapsulation} from '@angular/core';
-import { NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbModalRef,ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
 import { LoginService } from './login.service';
 import {Router} from '@angular/router';
 import {environment} from '../../environments/environment';
 import decode from 'jwt-decode';
+
 
 @Component({
   selector: 'app-login',
@@ -22,6 +23,8 @@ export class LoginComponent implements OnInit {
   opcion2: string;
   opcion3: string;
   sesion: boolean;
+  closeResult: string;
+
 
 
   constructor(private modalService: NgbModal, private loginService: LoginService, private router: Router) {
@@ -56,25 +59,27 @@ export class LoginComponent implements OnInit {
       localStorage.setItem( 'userAuth', datosString);
       localStorage.setItem( 'token', token);
       localStorage.setItem( 'user', usuario);
-      if (usuario.match(this.rolAdmin) !== null) {
+      localStorage.setItem( 'userName', username);
+        if (usuario.match(this.rolAdmin) !== null) {
+          this.cargando = false;
+          (document.getElementById('logButton') as HTMLInputElement).disabled = false;
+          this.loginService.setAccount(true);
+          this.router.navigate(['admin']);
+        } else if ((usuario.match(this.rolUser) !== null)) {
+          this.router.navigate(['user']);
+          this.sesion = true;
+        } else {
+          this.router.navigate(['']);
+          this.sesion = false;
+        }
+      }, err => {
         this.cargando = false;
         (document.getElementById('logButton') as HTMLInputElement).disabled = false;
-        this.loginService.setAccount(true);
-        this.router.navigate(['admin']);
-      } else if ((usuario.match(this.rolUser) !== null)) {
-        this.router.navigate(['user']);
-        this.sesion = true;
-      } else {
-        this.router.navigate(['']);
-        this.sesion = false;
+        console.log(err);
+      }, () => {
+        console.log('Finalizado inicio de sesion');
       }
-    }, err => {
-      this.cargando = false;
-      (document.getElementById('logButton') as HTMLInputElement).disabled = false;
-      console.log(err);
-    }, () => {
-      console.log('Finalizado inicio de sesion');
-    });
+    );
   }
 
   logOut() {
@@ -96,6 +101,24 @@ export class LoginComponent implements OnInit {
       } else {
         this.router.navigate(['']);
       }
+    }
+  }
+
+  open(login) {
+    this.modalService.open(login, {ariaLabelledBy: 'modal-basic-title', size: 'lg', centered: true}).result.then((result) => {
+      this.closeResult = `Closed with: ${result}`;
+    }, (reason) => {
+      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+    });
+  }
+
+  private getDismissReason(reason: any): string {
+    if (reason === ModalDismissReasons.ESC) {
+      return 'by pressing ESC';
+    } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
+      return 'by clicking on a backdrop';
+    } else {
+      return  `with: ${reason}`;
     }
   }
 }
