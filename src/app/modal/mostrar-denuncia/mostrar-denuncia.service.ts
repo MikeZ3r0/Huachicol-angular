@@ -34,7 +34,9 @@ export class MostrarDenunciaService {
         Authorization: 'Bearer ' + this.token,
       })
     };
-    return this.http.get(environment.mostrarDenuncia, this.httpOptionsAuth).pipe(
+    const userName = localStorage.getItem('userName');
+    console.log(environment.mostrarDenuncia+userName);
+    return this.http.get(environment.mostrarDenuncia+userName, this.httpOptionsAuth).pipe(
       map( datos => {
         return datos;
       })
