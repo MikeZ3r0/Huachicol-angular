@@ -72,6 +72,7 @@ export class LoginComponent implements OnInit {
         this.router.navigate(['']);
         this.sesion = false;
       }
+      this.modalReference.close();
     }, err => {
         this.cargando = false;
         (document.getElementById('logButton') as HTMLInputElement).disabled = false;
@@ -105,7 +106,8 @@ export class LoginComponent implements OnInit {
   }
 
   open(login) {
-    this.modalService.open(login, {ariaLabelledBy: 'modal-basic-title', size: 'lg', centered: true}).result.then((result) => {
+    this.modalReference = this.modalService.open(login, {ariaLabelledBy: 'modal-basic-title', size: 'lg', centered: true});
+    this.modalReference.result.then((result) => {
       this.closeResult = `Closed with: ${result}`;
     }, (reason) => {
       this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;

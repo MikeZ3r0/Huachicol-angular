@@ -1,9 +1,7 @@
-import {Component, OnInit, Input} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {LoginService} from '../login/login.service';
-
 import {Router} from '@angular/router';
 import {environment} from '../../environments/environment';
-
 
 
 @Component({
@@ -14,14 +12,10 @@ import {environment} from '../../environments/environment';
 
 export class NavbarComponent implements OnInit {
   public sesion: boolean;
-  @Input() estado: boolean;
-  cerrarLogin: boolean;
-
   public BotonPrincipal: string;
 
-  constructor(private loginService: LoginService,private router: Router) {
+  constructor(private loginService: LoginService, private router: Router) {
     this.sesion = false;
-    this.cerrarLogin = false;
   }
 
   ngOnInit(): void {
@@ -37,13 +31,6 @@ export class NavbarComponent implements OnInit {
       this.sesion = true;
     }
   }
-
-
-  LoginForm(estado: boolean) {
-    this.cerrarLogin = estado;
-    console.log('Recibiendo estado: ' + estado);
-  }
-
   logOut() {
     this.loginService.finalizarSesion();
     this.sesion = false;

@@ -31,8 +31,8 @@
       <div class="container">
         <div class="row col-*-*">
           <div class="form-group top-100">
-            <button type="submit" class="btn btn-light btn-xl" id="logButton" (click)="logIn(username.value, password.value, $event);modal.dismiss('Cross click')">
-              <i [ngClass]="{'fa-sign-in-alt':!cargando, 'fa-sync': cargando}" class="fas; green-text"></i>
+            <button type="submit" class="btn btn-light btn-xl" id="logButton" (click)="logIn(username.value, password.value, $event);">
+              <i [ngClass]="{'fa-sign-in-alt':!cargando, 'fa-sync': cargando}" class="fas green-text"></i>
               <span *ngIf="!cargando"> Ingresar</span>
               <span *ngIf="cargando">Validando</span>
             </button>
