@@ -30,6 +30,9 @@ import {MostrarDenunciaService} from './modal/mostrar-denuncia/mostrar-denuncia.
 import {RealizarDenunciaService} from './modal/realizar-denuncia/realizar-denuncia.service';
 
 import {DatePipe} from '@angular/common';
+import { RegistroUsuarioComponent } from './registro-usuario/registro-usuario.component';
+
+import { RegistroUsuarioService } from './registro-usuario/registro-usuario.service';
 
 
 @NgModule({
@@ -41,7 +44,8 @@ import {DatePipe} from '@angular/common';
     routingComponents,
     ServiciosComponent,
     MostrarDenunciaComponent,
-    RealizarDenunciaComponent
+    RealizarDenunciaComponent,
+    RegistroUsuarioComponent
   ],
   imports: [
     BrowserModule,
@@ -54,7 +58,7 @@ import {DatePipe} from '@angular/common';
     // Specify library as an import
     NgxTwitterTimelineModule
   ],
-  providers: [LoginService, LeerJSONService, MostrarDenunciaService, RealizarDenunciaService,  DatePipe],
+  providers: [LoginService, LeerJSONService, MostrarDenunciaService, RealizarDenunciaService,  DatePipe,RegistroUsuarioService ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
