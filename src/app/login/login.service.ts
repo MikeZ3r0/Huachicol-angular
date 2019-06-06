@@ -115,7 +115,8 @@ export class LoginService {
               type: 'Point',
               coordinates: [punto.center.coordinates[0].toFixed(5), punto.center.coordinates[1].toFixed(5)]
             },
-            properties: {Fecha: punto.fecha, Status: punto.estado, Distancia: punto.radio.toFixed(4), Pemex: false, SEDENA: false}
+            properties: {Fecha: punto.fecha, Status: punto.estado, Distancia: punto.radio.toFixed(4),
+              Pemex: this.checkEstado(punto.estado, 1), SEDENA: this.checkEstado(punto.estado, 2)}
           });
         }
       }
@@ -129,6 +130,15 @@ export class LoginService {
         return null;
       }
     });
+  }
+
+  checkEstado(texto, modo) {
+    if (texto.match( 'Sin asignar' ) !== null ) {
+      return false;
+    } else if (texto.match( 'En espera ' ) !== null ) {
+      return false;
+    }
+    return true;
   }
 
   getDenuncias2() {
@@ -156,6 +166,24 @@ export class LoginService {
   }
 
   pedirTecnicos(callback) {
+    this.token = this.obtenerToken();
+    if (!this.token) {
+      return null;
+    }
+    this.httpOptionsAuth = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Authorization: 'Bearer ' + this.token,
+      })
+    };
+    const tec = this.http.get(environment.tecnicoPemex, this.httpOptionsAuth).pipe(
+      map( datos => {
+        console.log(datos);
+
+        return datos;
+      })
+    );
+    console.log(tec);
     this.tecnicos = {
       type: 'FeatureCollection',
       features: [
@@ -176,6 +204,22 @@ export class LoginService {
   }
 
   pedirSedena(callback) {
+    this.token = this.obtenerToken();
+    if (!this.token) {
+      return null;
+    }
+    this.httpOptionsAuth = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Authorization: 'Bearer ' + this.token,
+      })
+    };
+    const sed = this.http.get(environment.personalSEDENA, this.httpOptionsAuth).pipe(
+      map( datos => {
+        return datos;
+      })
+    );
+    console.log(sed);
     this.sedena = {
       type: 'FeatureCollection',
       features: [

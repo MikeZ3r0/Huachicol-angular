@@ -15,7 +15,9 @@ export const environment = {
   invalidToken: 'invalid_token',
   crearDenuncia: 'https://damp-ocean-98658.herokuapp.com/api/v1/user/complain/',
   mostrarDenuncia: 'https://damp-ocean-98658.herokuapp.com/api/v1/user/complains/',
-  registroUsuario: 'https://auth-service-huachicol.herokuapp.com/api/v1/ciudadano'
+  registroUsuario: 'https://auth-service-huachicol.herokuapp.com/api/v1/ciudadano',
+  tecnicoPemex: 'https://auth-service-huachicol.herokuapp.com/api/v1/admin/PEMEX',
+  personalSEDENA: 'https://auth-service-huachicol.herokuapp.com/api/v1/admin/SEDENA'
 };
 
 /*

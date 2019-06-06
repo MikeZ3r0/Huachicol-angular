@@ -120,7 +120,7 @@ export class AdministradorComponent implements OnInit {
       type: 'Registro',
       datos: [
         {
-          type: 'Punto',
+          type: 'Center',
           id: 'ID_CENTRO'
         },
         {
