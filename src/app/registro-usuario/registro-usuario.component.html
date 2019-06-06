@@ -1,0 +1,60 @@
+<ng-template #registroUsuario let-modal>
+  <div class="modal-content" data-modal-target="#form-overlay" data-modal-fit-viewport="false">
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Registro</h4>
+      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form (ngSubmit)="onSubmit(registroForm)" #registroForm="ngForm">
+          <div class="form-group">
+            <label for="nombre">Nombre</label>
+            <input type="text" class="form-control" name="nombre" id="nombre" placeholder="Ingrese su nombre" required [(ngModel)]="usuarioModel.nombre" #nombre="ngModel">
+            <div [hidden]="nombre.valid || nombre.pristine" class="alert alert-danger">
+              Por favor ingrese su nombre
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="username">Usuario</label>
+            <input type="email" class="form-control" name="username" id="username" placeholder="Ingrese su email" required [(ngModel)]="usuarioModel.userName" #userName="ngModel">
+            <div [hidden]="userName.valid || userName.pristine" class="alert alert-danger">
+              Por favor ingrese un correo
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="password">Contraseña</label>
+            <label for="password">Longitud mínima de 5 caracteres alfanúmericos</label>
+            <input type="password" class="form-control" #password name="password" id="password"  placeholder="Ingrese su contraseña" required [(ngModel)]="usuarioModel.password" #password="ngModel">
+            <div [hidden]="password.valid || password.pristine" class="alert alert-danger">
+              Por favor ingrese una contraseña
+            </div>
+          </div>
+        <br>
+        <div id="successlog"></div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <div class="container">
+        <div class="row col-*-*">
+          <div class="form-group top-100">
+            <button type="submit" class="btn btn-light btn-xl" id="regButton" (click)="onSubmit(registroForm);modal.dismiss('Cross click')">
+              <i [ngClass]="{'fa-sign-in-alt':!cargando, 'fa-sync': cargando}" class="fas"></i>
+              <span *ngIf="!cargando">Ingresar</span>
+              <span *ngIf="cargando">Validando</span>
+            </button>
+            <button type="button" class="btn btn-light" (click)="modal.dismiss('Cross click')" #closeLoginModal>Cerrar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+
+<button  type="button" class="btn btn-outline-dark btn-lg" (click)="open(registroUsuario)">
+  <mdb-icon fas icon="user-plus" size="lg" class="green-text pr-1" aria-hidden="true"></mdb-icon>
+  Registrarse
+</button>
+
+<!--button class="login waves-light" >Iniciar sesion</button-->
