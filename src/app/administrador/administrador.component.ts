@@ -2,7 +2,8 @@ import {Component, OnInit, ViewChild} from '@angular/core';
 import {LoginService} from '../login/login.service';
 import {Router} from '@angular/router';
 import { NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
-import { getDistance } from 'ol/sphere';
+
+// import { getDistance } from 'ol/sphere';
 
 import { MapaComponent } from '../mapa/mapa.component';
 
@@ -62,7 +63,7 @@ export class AdministradorComponent implements OnInit {
     }
   }
 
-  distancia(pt1, pt2) {
+/*  distancia(pt1, pt2) {
     let dis = 0;
     dis += getDistance(pt1, pt2, null);
     let output;
@@ -74,7 +75,7 @@ export class AdministradorComponent implements OnInit {
         ' ' + 'm';
     }
     return output;
-  }
+  }*/
 
   actualizarMapa(): void {
     this.mapa.actualizar();
@@ -157,5 +158,3 @@ export class AdministradorComponent implements OnInit {
   }
 
 }
-
-

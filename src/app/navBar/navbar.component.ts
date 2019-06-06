@@ -1,6 +1,10 @@
 import {Component, OnInit, Input} from '@angular/core';
 import {LoginService} from '../login/login.service';
 
+import {Router} from '@angular/router';
+import {environment} from '../../environments/environment';
+
+
 
 @Component({
   selector: 'app-navbar',
@@ -12,9 +16,10 @@ export class NavbarComponent implements OnInit {
   public sesion: boolean;
   @Input() estado: boolean;
   cerrarLogin: boolean;
+
   public BotonPrincipal: string;
 
-  constructor(private loginService: LoginService) {
+  constructor(private loginService: LoginService,private router: Router) {
     this.sesion = false;
     this.cerrarLogin = false;
   }
@@ -33,8 +38,32 @@ export class NavbarComponent implements OnInit {
     }
   }
 
+
   LoginForm(estado: boolean) {
     this.cerrarLogin = estado;
     console.log('Recibiendo estado: ' + estado);
   }
+
+  logOut() {
+    this.loginService.finalizarSesion();
+    this.sesion = false;
+    this.router.navigate(['']);
+  }
+
+  miPagina() {
+    const usuario = localStorage.getItem('user');
+    if (!usuario) {
+      this.logOut();
+    } else {
+      this.loginService.setAccount(true);
+      if (usuario.match(environment.adminRole) !== null) {
+        this.router.navigate(['admin']);
+      } else if (usuario.match(environment.userRole) !== null) {
+        this.router.navigate(['user']);
+      } else {
+        this.router.navigate(['']);
+      }
+    }
+  }
+
 }

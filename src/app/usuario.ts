@@ -1,7 +1,10 @@
 export class Usuario {
 
-  constructor(public usuario: string,
-              public contrasena: string) {
+  constructor(public nombre: string,
+              public userName: string,
+              public celular: number,
+              public password: string,
+              public profiles: [{profileName: string}]) {
 
   }
 
