@@ -49,7 +49,6 @@ export class AdministradorComponent implements OnInit {
   }
 
   openVerticallyCentered(content) {
-    console.log(content);
     this.modalReference = this.modalService.open(content, { centered: true, backdropClass: 'light-blue-backdrop', size: 'lg' });
   }
 
@@ -63,19 +62,19 @@ export class AdministradorComponent implements OnInit {
     }
   }
 
-/*  distancia(pt1, pt2) {
-    let dis = 0;
-    dis += getDistance(pt1, pt2, null);
-    let output;
-    if (dis > 1000) {
-      output = (Math.round(dis / 1000 * 100) / 100) +
-        ' ' + 'km';
-    } else {
-      output = (Math.round(dis * 100) / 100) +
-        ' ' + 'm';
-    }
-    return output;
-  }*/
+  /*  distancia(pt1, pt2) {
+      let dis = 0;
+      dis += getDistance(pt1, pt2, null);
+      let output;
+      if (dis > 1000) {
+        output = (Math.round(dis / 1000 * 100) / 100) +
+          ' ' + 'km';
+      } else {
+        output = (Math.round(dis * 100) / 100) +
+          ' ' + 'm';
+      }
+      return output;
+    }*/
 
   actualizarMapa(): void {
     this.mapa.actualizar();
@@ -86,16 +85,16 @@ export class AdministradorComponent implements OnInit {
   }
 
   actualizarTablaDenuncias() {
-  this.loginService.pedirDenuncias((status) => {
-    if (status) {
-      this.denuncias = this.loginService.getDenuncias2();
-      console.log(this.denuncias);
-      this.actualizarMapa();
-    }
-  });
+    this.loginService.pedirDenuncias((status) => {
+      if (status) {
+        this.denuncias = this.loginService.getDenuncias2();
+        this.actualizarMapa();
+      }
+    });
   }
 
   tablaTecnicos(id, punto) {
+
     this.loginService.pedirTecnicos((status) => {
       if (status === true) {
         this.tecnicos = this.loginService.getTecnicos();
@@ -116,33 +115,25 @@ export class AdministradorComponent implements OnInit {
   }
 
   enviarAsignacion(id, tipo, modal) {
-    const respuesta = {
-      type: 'Registro',
-      datos: [
-        {
-          type: 'Center',
-          id: 'ID_CENTRO'
-        },
-        {
-          type: 'Asignado',
-          id: '(ID_PEMEX|ID_SEDENA)'
-        }
-      ],
-      destino: '(PEMEX|SEDENA)'
+    let opcion = '2';
+    if ( tipo.match('tecnico') !== null) {
+      opcion = '1';
+    }
+    const res = {
+      centro: this.puntoActual.id,
+      asignacion: id.properties.Correo,
+      dependencia: opcion,
     };
-    const respuesta1 = JSON.stringify(respuesta);
+    const respuesta1 = JSON.stringify(res);
     this.respuesta = JSON.parse(respuesta1);
-    this.respuesta.datos[0].id = this.puntoActual.id;
-    this.respuesta.datos[1].id = id.id;
     this.loginService.asignacion(this.respuesta).subscribe(status => {
-      console.log(status);
-      this.mostrarMensaje('Asignación completa', 'Asignación completada con exito', true, modal, () => {});
-    }, error1 => {
+        this.mostrarMensaje('Asignación completa', 'Asignación completada con exito', true, modal, () => {});
+      }, error1 => {
         this.mostrarMensaje('Asignación cancelada', 'La asignación no fue posible, accion cancelada, intente más tarde',
           false, modal, () => {});
         console.log(error1);
       }
-      );
+    );
   }
 
   mostrarMensaje(titulo, cuerpo, estado, modal, callback) {

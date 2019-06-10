@@ -232,7 +232,7 @@ export class MapaComponent implements OnInit {
       const pattern = ctx.createPattern(tCnv, 'repeat');
       const str = new Stroke();
       str.setWidth(size);
-      // str.setColor(pattern);
+      //str.setColor(pattern);
       estilo = new Style({
         stroke: str,
       });

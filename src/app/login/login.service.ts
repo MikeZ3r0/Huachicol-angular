@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import {environment} from '../../environments/environment';
-import { map } from 'rxjs/operators';
+import {map, retry} from 'rxjs/operators';
 import {Router} from '@angular/router';
 
 
@@ -58,6 +58,7 @@ export class LoginService {
       })
     };
     return this.http.get(environment.reportPoint, this.httpOptionsAuth).pipe(
+      retry(1),
       map( datos => {
         return datos;
       })
@@ -106,14 +107,17 @@ export class LoginService {
         "type": "FeatureCollection",
         "features": []
       };
+      console.log(datos);
       const json = JSON.parse(JSON.stringify(datos));
-      for (const punto of json.complain_centers) {
+      console.log(json);
+      for (const punto of json) {
         if (punto.hasOwnProperty('center')) {
           this.denuncias.features.push({
             type: 'Feature',
+            id: punto._id,
             geometry: {
               type: 'Point',
-              coordinates: [punto.center.coordinates[0].toFixed(5), punto.center.coordinates[1].toFixed(5)]
+              coordinates: [punto.center.coordinates[1].toFixed(5), punto.center.coordinates[0].toFixed(5)]
             },
             properties: {Fecha: punto.fecha, Status: punto.estado, Distancia: punto.radio.toFixed(4),
               Pemex: this.checkEstado(punto.estado, 1), SEDENA: this.checkEstado(punto.estado, 2)}
@@ -133,10 +137,21 @@ export class LoginService {
   }
 
   checkEstado(texto, modo) {
+    console.log('Modo: ' + modo);
+    console.log('Texto: ' + texto);
     if (texto.match( 'Sin asignar' ) !== null ) {
+      console.log('Sin asignar');
       return false;
-    } else if (texto.match( 'En espera ' ) !== null ) {
-      return false;
+    } else if (modo === 1) {
+      console.log('Buscando PEMEX: ' + texto.search( /PEMEX en espera/i ));
+      if (texto.search( /PEMEX en espera/i ) > -1 ) {
+        return false;
+      }
+    } else {
+      console.log('Buscando SEDENA: ' + texto.search( /SEDENA en espera/i ));
+      if (texto.search( /SEDENA en espera/i ) > -1 ) {
+        return false;
+      }
     }
     return true;
   }
@@ -148,24 +163,11 @@ export class LoginService {
   getDenuncias() {
     this.denuncias = {
       type: 'FeatureCollection',
-      features: [
-        {type: 'Feature', id: '15', properties: { Fecha: '', Status: 'En proceso', Distancia: 1000, Pemex: true, SEDENA: false},
-          geometry: {type: 'Point', coordinates: [-99.1418708, 19.4440685]}},
-        {type: 'Feature', id: '17', properties: { Fecha: '', Status: 'En proceso', Distancia: 700, Pemex: true, SEDENA: false},
-          geometry: {type: 'Point', coordinates: [-99.0500927, 19.559797]}},
-        {type: 'Feature', id: '21', properties: { Fecha: '', Status: 'En espera', Distancia: 1500, Pemex: false, SEDENA: true},
-          geometry: {type: 'Point', coordinates: [-98.9352197, 19.835556]}},
-        {type: 'Feature', id: '30', properties: { Fecha: '', Status: 'En espera', Distancia: 600, Pemex: true, SEDENA: false},
-          geometry: {type: 'Point', coordinates: [-105.364325, 28.060944]}},
-        {type: 'Feature', id: '42', properties: { Fecha: '', Status: 'Sin asignar', Distancia: 1800, Pemex: false, SEDENA: false},
-          geometry: {type: 'Point', coordinates: [-104.950253, 27.278238]}},
-        {type: 'Feature', id: '43', properties: { Fecha: '', Status: 'En proceso', Distancia: 300, Pemex: true, SEDENA: true},
-          geometry: {type: 'Point', coordinates: [-108.814288, 25.761545]}}
-      ]};
+      features: []};
     return this.denuncias;
   }
 
-  pedirTecnicos(callback) {
+  servicioTecnicos() {
     this.token = this.obtenerToken();
     if (!this.token) {
       return null;
@@ -176,27 +178,51 @@ export class LoginService {
         Authorization: 'Bearer ' + this.token,
       })
     };
-    const tec = this.http.get(environment.tecnicoPemex, this.httpOptionsAuth).pipe(
+    return this.http.get(environment.tecnicoPemex, this.httpOptionsAuth).pipe(
       map( datos => {
-        console.log(datos);
-
         return datos;
       })
     );
-    console.log(tec);
-    this.tecnicos = {
-      type: 'FeatureCollection',
-      features: [
-        {type: 'Feature', id: '2014', properties: { Nombre: 'Marisol Rodriguez', Status: 'Disponible'},
-          geometry: {type: 'Point', coordinates: [-99.1418708, 19.4440685]}},
-        {type: 'Feature', id: '0048', properties: { Nombre: 'Carlos Cortes', Status: 'Ocupado'},
-          geometry: {type: 'Point', coordinates: [-99.0500927, 19.559797]}},
-        {type: 'Feature', id: '4582', properties: { Nombre: 'Jorge Trejo', Status: 'Ocupado'},
-          geometry: {type: 'Point', coordinates: [-98.9352197, 19.835556]}},
-        {type: 'Feature', id: '5548', properties: { Nombre: 'Gilberto Rosas', Status: 'Disponible'},
-          geometry: {type: 'Point', coordinates: [-105.364325, 28.060944]}},
-      ]};
-    callback(true);
+  }
+
+  servicioSedena() {
+    this.token = this.obtenerToken();
+    if (!this.token) {
+      return null;
+    }
+    this.httpOptionsAuth = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Authorization: 'Bearer ' + this.token,
+      })
+    };
+    return this.http.get(environment.personalSEDENA, this.httpOptionsAuth).pipe(
+      map( datos => {
+        return datos;
+      })
+    );
+  }
+
+  pedirTecnicos(callback) {
+    this.servicioTecnicos().subscribe( datos => {
+
+      this.tecnicos = {
+        "type": "FeatureCollection",
+        "features": []
+      };
+      const json = JSON.parse(JSON.stringify(datos));
+      for (const tecnico of json) {
+        console.log(tecnico);
+        if (tecnico.hasOwnProperty('id')) {
+          this.tecnicos.features.push({
+            type: 'Feature',
+            id: tecnico.id,
+            properties: {Nombre: tecnico.nombre, Status: 'Disponible', Correo: tecnico.userName}
+          });
+        }
+      }
+      callback(true);
+    });
   }
 
   getTecnicos() {
@@ -204,35 +230,24 @@ export class LoginService {
   }
 
   pedirSedena(callback) {
-    this.token = this.obtenerToken();
-    if (!this.token) {
-      return null;
-    }
-    this.httpOptionsAuth = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/x-www-form-urlencoded',
-        Authorization: 'Bearer ' + this.token,
-      })
-    };
-    const sed = this.http.get(environment.personalSEDENA, this.httpOptionsAuth).pipe(
-      map( datos => {
-        return datos;
-      })
-    );
-    console.log(sed);
-    this.sedena = {
-      type: 'FeatureCollection',
-      features: [
-        {type: 'Feature', id: '666', properties: { Status: 'Disponible'},
-          geometry: {type: 'Point', coordinates: [-99.1418708, 19.4440685]}},
-        {type: 'Feature', id: '999', properties: { Status: 'Ocupado'},
-          geometry: {type: 'Point', coordinates: [-99.0500927, 19.559797]}},
-        {type: 'Feature', id: '696', properties: { Status: 'Ocupado'},
-          geometry: {type: 'Point', coordinates: [-98.9352197, 19.835556]}},
-        {type: 'Feature', id: '911', properties: { Status: 'Disponible'},
-          geometry: {type: 'Point', coordinates: [-105.364325, 28.060944]}},
-      ]};
-    callback(true);
+    this.servicioSedena().subscribe( datos => {
+
+      this.sedena = {
+        "type": "FeatureCollection",
+        "features": []
+      };
+      const json = JSON.parse(JSON.stringify(datos));
+      for (const tecnico of json) {
+        if (tecnico.hasOwnProperty('id')) {
+          this.sedena.features.push({
+            type: 'Feature',
+            id: tecnico.id,
+            properties: {Nombre: tecnico.nombre, Status: 'Disponible', Correo: tecnico.userName}
+          });
+        }
+      }
+      callback(true);
+    });
   }
 
   getSedena() {
@@ -246,18 +261,16 @@ export class LoginService {
     }
     this.httpOptionsAuth = {
       headers: new HttpHeaders({
-        'Content-Type': 'application/x-www-form-urlencoded',
-        Authorization: 'Bearer ' + this.token,
-      })
-    };
-    /*
-    return this.http.post(environment.assignPoint, JSON.stringify(content), this.httpOptionsAuth).pipe(
-      map( datos => {
-        return datos;
-      })
-    );*/
 
-    return this.http.get(environment.ductosPoint, this.httpOptionsAuth).pipe(
+        Authorization: 'Bearer ' + this.token,
+      }),
+      params: new HttpParams()
+        .set('centro', content.centro )
+        .set('asignacion', content.asignacion)
+        .set('dependencia', content.dependencia)
+    };
+
+    return this.http.put(environment.asignar, {}, this.httpOptionsAuth).pipe(
       map( datos => {
         return datos;
       })

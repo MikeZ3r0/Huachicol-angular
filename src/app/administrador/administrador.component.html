@@ -14,7 +14,7 @@
               <th>Coordenadas</th>
               <th>Fecha</th>
               <th>Status</th>
-              <th>Distancia al ducto</th>
+              <th>Radio</th>
               <th>Acciones</th>
             </tr>
           </thead>
@@ -22,9 +22,9 @@
             <tr *ngFor="let d of denuncias.features">
               <th class="priority-1"> {{d.id}}</th>
               <td data-th="Coordenadas: " class="priority-3 coo" (click)="verPunto(d.geometry.coordinates)"> {{d.geometry.coordinates[1]}}, {{d.geometry.coordinates[0]}} </td>
-              <td data-th="Descripción: " class="priority-2 des">{{d.properties.Fecha}}</td>
+              <td data-th="Descripción: " class="priority-2 des">{{d.properties.Fecha.split("T")[0]}} {{(d.properties.Fecha.split("T")[1]).split(".")[0]}}</td>
               <td data-th="Status: " class="priority-1">{{d.properties.Status}}</td>
-              <td data-th="Distancia: " class="priority-3">{{d.properties.Distancia}}</td>
+              <td data-th="Distancia: " class="priority-3">{{d.properties.Distancia}} m</td>
               <td class="priority-1">
                 <div class="btn-group-sm justify-content-between btn-action">
                   <button type="button" class="btn" mdbWavesEffect (click)="tablaTecnicos(pemex, d)"
@@ -118,16 +118,16 @@
                   <thead class="thead-dark">
                   <tr scope="row">
                     <th >ID</th>
+                    <th>Nombre</th>
                     <th>Status</th>
-                    <th>Distancia al ducto</th>
                     <th>Acciones</th>
                   </tr>
                   </thead>
                   <tbody>
                   <tr *ngFor="let s of sedena.features">
                     <th class="priority-1"> {{s.id}}</th>
+                    <td data-th="Distancia: " class="priority-1"> {{s.properties.Nombre}}</td>
                     <td data-th="Status: " class="priority-1">{{s.properties.Status}}</td>
-                    <td data-th="Distancia: " class="priority-1"></td>
                     <td class="priority-1">
                       <div class="btn-group-sm justify-content-between">
                         <button  type="button" class="btn btn-dark" mdbWavesEffect (click)="enviarAsignacion(s, 'sedena', message)"
