@@ -5,39 +5,40 @@
   <h2 class="text-center text-uppercase text-secondary mb-0">Control de denuncias</h2>
   <hr class="star-dark mb-5">
   <div class="contenidoPemex col-12 mx-auto">
+    <button type="button" class="btn btn-dark" (click)="actualizarTablaDenuncias()">Actualizar tabla</button>
     <div class="row justify-content-between">
       <div class="tabla col-lg-8 col-sm-12">
         <table class="denuncias table table-hover table-responsive-sm " id="tablaDenuncias">
           <thead class="thead-dark">
-            <tr scope="row">
-              <th >Folio</th>
-              <th>Coordenadas</th>
-              <th>Fecha</th>
-              <th>Status</th>
-              <th>Radio</th>
-              <th>Acciones</th>
-            </tr>
+          <tr scope="row">
+            <th >Folio</th>
+            <th>Coordenadas</th>
+            <th>Fecha</th>
+            <th>Status</th>
+            <th>Radio</th>
+            <th>Acciones</th>
+          </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let d of denuncias.features">
-              <th class="priority-1"> {{d.id}}</th>
-              <td data-th="Coordenadas: " class="priority-3 coo" (click)="verPunto(d.geometry.coordinates)"> {{d.geometry.coordinates[1]}}, {{d.geometry.coordinates[0]}} </td>
-              <td data-th="Descripción: " class="priority-2 des">{{d.properties.Fecha.split("T")[0]}} {{(d.properties.Fecha.split("T")[1]).split(".")[0]}}</td>
-              <td data-th="Status: " class="priority-1">{{d.properties.Status}}</td>
-              <td data-th="Distancia: " class="priority-3">{{d.properties.Distancia}} m</td>
-              <td class="priority-1">
-                <div class="btn-group-sm justify-content-between btn-action">
-                  <button type="button" class="btn" mdbWavesEffect (click)="tablaTecnicos(pemex, d)"
-                          data-toggle="button" aria-pressed="false" [ngClass]="{'btn-outline-success disabled': d.properties.Pemex === true, 'btn-dark': d.properties.Pemex === false}">
-                    <i class="fas fa-tools"></i>
-                  </button>
-                  <button  type="button" class="btn btn-dark " mdbWavesEffect (click)="tablaSedena(SEDENA, d)"
-                           data-toggle="button" aria-pressed="false" [ngClass]="{'btn-outline-success disabled': d.properties.SEDENA === true, 'btn-dark': d.properties.SEDENA === false}">
-                    <i class="fas fa-taxi"></i>
-                  </button>
-                </div>
-              </td>
-            </tr>
+          <tr *ngFor="let d of denuncias.features">
+            <th class="priority-1"> {{d.id}}</th>
+            <td data-th="Coordenadas: " class="priority-3 coo" (click)="verPunto(d.geometry.coordinates)"> {{d.geometry.coordinates[1]}}, {{d.geometry.coordinates[0]}} </td>
+            <td data-th="Descripción: " class="priority-2 des">{{d.properties.Fecha.split("T")[0]}} {{(d.properties.Fecha.split("T")[1]).split(".")[0]}}</td>
+            <td data-th="Status: " class="priority-1">{{d.properties.Status}}</td>
+            <td data-th="Distancia: " class="priority-3">{{d.properties.Distancia}} m</td>
+            <td class="priority-1">
+              <div class="btn-group-sm justify-content-between btn-action">
+                <button type="button" class="btn" mdbWavesEffect (click)="tablaTecnicos(pemex, d)"
+                        data-toggle="button" aria-pressed="false" [ngClass]="{'btn-outline-success disabled': d.properties.Pemex === true, 'btn-dark': d.properties.Pemex === false}">
+                  <i class="fas fa-tools"></i>
+                </button>
+                <button  type="button" class="btn btn-dark " mdbWavesEffect (click)="tablaSedena(SEDENA, d)"
+                         data-toggle="button" aria-pressed="false" [ngClass]="{'btn-outline-success disabled': d.properties.SEDENA === true, 'btn-dark': d.properties.SEDENA === false}">
+                  <i class="fas fa-taxi"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
           </tbody>
         </table>
       </div>
@@ -102,54 +103,54 @@
 
 <!-- Modal SEDENA -->
 <ng-template #SEDENA let-modal>
-    <div class="modal-container">
-      <div class="modal-header">
-        <h4 class="modal-title">SEDENA</h4>
-        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="container">
-          <div class="row">
-            <div class="col-lg-12 mx-auto">
-              <div class="tabla col-sm-12">
-                <table class="sedena table table-hover table-responsive-sm" id="tablaSedena">
-                  <thead class="thead-dark">
-                  <tr scope="row">
-                    <th >ID</th>
-                    <th>Nombre</th>
-                    <th>Status</th>
-                    <th>Acciones</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  <tr *ngFor="let s of sedena.features">
-                    <th class="priority-1"> {{s.id}}</th>
-                    <td data-th="Distancia: " class="priority-1"> {{s.properties.Nombre}}</td>
-                    <td data-th="Status: " class="priority-1">{{s.properties.Status}}</td>
-                    <td class="priority-1">
-                      <div class="btn-group-sm justify-content-between">
-                        <button  type="button" class="btn btn-dark" mdbWavesEffect (click)="enviarAsignacion(s, 'sedena', message)"
-                                 data-toggle="button" aria-pressed="false">
-                          <i class="fas fa-file-signature"></i>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                  </tbody>
-                </table>
-              </div>
+  <div class="modal-container">
+    <div class="modal-header">
+      <h4 class="modal-title">SEDENA</h4>
+      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-12 mx-auto">
+            <div class="tabla col-sm-12">
+              <table class="sedena table table-hover table-responsive-sm" id="tablaSedena">
+                <thead class="thead-dark">
+                <tr scope="row">
+                  <th >ID</th>
+                  <th>Nombre</th>
+                  <th>Status</th>
+                  <th>Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr *ngFor="let s of sedena.features">
+                  <th class="priority-1"> {{s.id}}</th>
+                  <td data-th="Distancia: " class="priority-1"> {{s.properties.Nombre}}</td>
+                  <td data-th="Status: " class="priority-1">{{s.properties.Status}}</td>
+                  <td class="priority-1">
+                    <div class="btn-group-sm justify-content-between">
+                      <button  type="button" class="btn btn-dark" mdbWavesEffect (click)="enviarAsignacion(s, 'sedena', message)"
+                               data-toggle="button" aria-pressed="false">
+                        <i class="fas fa-file-signature"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
       </div>
-      <div class="modal-footer">
-        <div class="form-group top-100">
-          <button type="button" class="btn btn-light" (click)="modal.close('Close click')" #closeLoginModal>Cancelar</button>
-        </div>
+    </div>
+    <div class="modal-footer">
+      <div class="form-group top-100">
+        <button type="button" class="btn btn-light" (click)="modal.close('Close click')" #closeLoginModal>Cancelar</button>
       </div>
     </div>
+  </div>
 </ng-template>
 
 <!-- Modal message -->

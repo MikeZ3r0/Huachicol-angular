@@ -11,7 +11,7 @@ import {environment} from '../environments/environment';
 const routes: Routes = [
   { path: '', component: PrincipalComponent },
   { path: 'admin', component: AdministradorComponent, canActivate: [AuthGuard], data: { expectedRole: environment.adminRole}},
-  { path: 'user', component: ServiciosComponent, canActivate: [AuthGuard], data: { expectedRole: environment.userRole}},
+  { path: 'user', component: PrincipalComponent, canActivate: [AuthGuard], data: { expectedRole: environment.userRole}},
   { path: 'home', component: PrincipalComponent}
 ];
 

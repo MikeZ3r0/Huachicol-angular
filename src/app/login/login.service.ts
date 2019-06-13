@@ -14,6 +14,8 @@ export class LoginService {
   denuncias;
   tecnicos;
   sedena;
+  sedenaCoord;
+  denunciaCoord;
 
   constructor(private http: HttpClient, private router: Router) {
     this.httpOptions = {
@@ -107,9 +109,7 @@ export class LoginService {
         "type": "FeatureCollection",
         "features": []
       };
-      console.log(datos);
       const json = JSON.parse(JSON.stringify(datos));
-      console.log(json);
       for (const punto of json) {
         if (punto.hasOwnProperty('center')) {
           this.denuncias.features.push({
@@ -122,6 +122,9 @@ export class LoginService {
             properties: {Fecha: punto.fecha, Status: punto.estado, Distancia: punto.radio.toFixed(4),
               Pemex: this.checkEstado(punto.estado, 1), SEDENA: this.checkEstado(punto.estado, 2)}
           });
+          if (this.checkEstado(punto.estado, 2)) {
+            this.denunciaCoord = [punto.center.coordinates[1], punto.center.coordinates[0]];
+          }
         }
       }
       callback(true);
@@ -137,18 +140,13 @@ export class LoginService {
   }
 
   checkEstado(texto, modo) {
-    console.log('Modo: ' + modo);
-    console.log('Texto: ' + texto);
     if (texto.match( 'Sin asignar' ) !== null ) {
-      console.log('Sin asignar');
       return false;
     } else if (modo === 1) {
-      console.log('Buscando PEMEX: ' + texto.search( /PEMEX en espera/i ));
       if (texto.search( /PEMEX en espera/i ) > -1 ) {
         return false;
       }
     } else {
-      console.log('Buscando SEDENA: ' + texto.search( /SEDENA en espera/i ));
       if (texto.search( /SEDENA en espera/i ) > -1 ) {
         return false;
       }
@@ -275,5 +273,21 @@ export class LoginService {
         return datos;
       })
     );
+  }
+
+  setSedenaCoord(point) {
+    this.sedenaCoord = point;
+  }
+
+  setDenunciaCoord(point) {
+    this.denunciaCoord = point;
+  }
+
+  getSedenaCoord() {
+    return this.sedenaCoord;
+  }
+
+  getDenunciaCoord() {
+    return this.denunciaCoord;
   }
 }

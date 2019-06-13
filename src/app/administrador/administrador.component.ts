@@ -41,6 +41,7 @@ export class AdministradorComponent implements OnInit {
     this.wStatus = 'col-md-2';
     this.wDistance = 'col-md-2';
     this.wAction = 'col-md-2';
+    this.puntoActual = null;
   }
 
   ngOnInit() {
@@ -127,6 +128,9 @@ export class AdministradorComponent implements OnInit {
     const respuesta1 = JSON.stringify(res);
     this.respuesta = JSON.parse(respuesta1);
     this.loginService.asignacion(this.respuesta).subscribe(status => {
+        if (this.puntoActual !== null) {
+          this.loginService.setDenunciaCoord(this.puntoActual.geometry.coordinates);
+        }
         this.mostrarMensaje('Asignación completa', 'Asignación completada con exito', true, modal, () => {});
       }, error1 => {
         this.mostrarMensaje('Asignación cancelada', 'La asignación no fue posible, accion cancelada, intente más tarde',

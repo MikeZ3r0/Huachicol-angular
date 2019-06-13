@@ -5,27 +5,27 @@ import OlTileLayer from 'ol/layer/Tile';
 import Vector from 'ol/layer/Vector';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
+import OSM from 'ol/source/OSM';
 import GeoJSON from 'ol/format/GeoJSON';
 import OlView from 'ol/View';
-import OSM from 'ol/source/OSM';
 import FullScreen from 'ol/control/Fullscreen';
 import OverviewMap from 'ol/control/OverviewMap';
 import ScaleLine from 'ol/control/ScaleLine';
 import Style from 'ol/style/Style';
 import Stroke from 'ol/style/Stroke';
 import Icon from 'ol/style/Icon';
-import Geolocation from 'ol/Geolocation';
-import Feature from 'ol/Feature';
 import Fill from 'ol/style/Fill';
 import CircleStyle from 'ol/style/Circle';
+import Geolocation from 'ol/Geolocation';
+import Feature from 'ol/Feature';
 import Point from 'ol/geom/Point';
-
-
+import LineString from 'ol/geom/LineString';
+import Polyline from 'ol/format/Polyline';
+import { fromLonLat, transform } from '../../../node_modules/ol/proj';
 import {LeerJSONService} from '../leer-json.service';
 
 import {LoginService} from '../login/login.service';
 import {environment} from '../../environments/environment';
-import LineString from 'ol/geom/LineString';
 
 
 
@@ -55,14 +55,68 @@ export class MapaComponent implements OnInit {
   geolocsource: VectorSource;
   geoloclayer: VectorLayer;
   geolocLiveCoords;
+  urlOsrmNearest: string;
+  urlOsrmRoute: string;
+  sedenaSource: VectorSource;
+  sedenaLayer: Vector;
+  sedenaStyle;
+  sedenaIcon: string;
+  animating: boolean;
+  now;
+  speed;
+  moveFeature;
+  route;
   @Input() isChecked: boolean;
 
   constructor(private ljson: LeerJSONService, private loginService: LoginService) {
     this.ductosURL = ['ductos.json', 'sistemaGuaymas.json', 'sistemaHobbs-Mendez.json', 'sistemaNorte.json',
       'sistemaPetroquimico.json', 'sistemaProgreso.json', 'sistemaRosarito.json', 'sistemaSur-Golfo-Centro-Occidente.json',
-        'sistemaTopolobampo.json'
+      'sistemaTopolobampo.json'
     ];
     this.isChecked = false;
+    this.urlOsrmNearest = '//router.project-osrm.org/nearest/v1/driving/';
+    this.urlOsrmRoute = '//router.project-osrm.org/route/v1/driving/';
+    this.sedenaIcon = '/assets/img/police_guard.png';
+    this.sedenaSource = new VectorSource();
+    this.sedenaLayer = new Vector({
+        source: this.sedenaSource
+      }
+    );
+    const sz = [.3, .5, .8, 1];
+    const icon = new Icon({
+      anchor: [0.5, 1],
+      src: this.sedenaIcon,
+      scale: sz[0]
+    });
+    this.sedenaStyle = {
+      route: new Style({
+        stroke: new Stroke({
+          width: 6, color: [40, 40, 40, 0.3]
+        })
+      }),
+      icon: (feature, resolution) => {
+        const scale = this.tamano(resolution);
+        icon.setScale(sz[scale]);
+        return new Style({
+          image: icon
+        });
+      },
+      geoMarker: new Style({
+        /*image: new CircleStyle({
+            radius: 7,
+            fill: new Fill({color: 'black'}),
+            stroke: new Stroke({
+              color: 'white', width: 2
+            })
+          })*/
+        image: new Icon({
+          anchor: [0.5, 1],
+          src: this.sedenaIcon,
+          scale: sz[4]
+        })
+      })
+    };
+    this.animating = false;
   }
 
   ngOnInit() {
@@ -232,7 +286,7 @@ export class MapaComponent implements OnInit {
       const pattern = ctx.createPattern(tCnv, 'repeat');
       const str = new Stroke();
       str.setWidth(size);
-      //str.setColor(pattern);
+      // str.setColor(pattern);
       estilo = new Style({
         stroke: str,
       });
@@ -289,45 +343,172 @@ export class MapaComponent implements OnInit {
   }
 
   flyTo(location, done) {
-     let durationAnimation = 2000;
-     const view = this.map.getView();
-     let zoomMap = view.getZoom();
-     let zoom2 = view.getMinZoom();
-     if (zoomMap === 4) {
-       zoom2 = zoomMap;
-       zoomMap = 7;
-     } else if (zoomMap < 8) {
-       zoom2 = zoomMap - 1;
-     } else if (zoomMap < 14) {
-       zoom2 = zoomMap - 2;
-     } else if (zoomMap < 18) {
-       zoom2 = zoomMap - 6;
-     } else {
-       durationAnimation = 6000;
-       zoom2 = zoomMap - 10;
-     }
-     let parts = 2;
-     let called = false;
-     function callback(complete) {
-       -- parts;
-       if (called) {
-         return;
-       }
-       if (parts === 0 || !complete) {
-         called = true;
-         done(complete);
-       }
-     }
-     view.animate({
-       center: location,
-       duration: durationAnimation
-     }, callback);
-     view.animate({
-       zoom: zoom2,
-       duration: durationAnimation / 2
-     }, {
-       zoom: zoomMap,
-       duration: durationAnimation / 2
-     }, callback);
-   }
+    let durationAnimation = 2000;
+    const view = this.map.getView();
+    let zoomMap = view.getZoom();
+    let zoom2 = view.getMinZoom();
+    if (zoomMap === 4) {
+      zoom2 = zoomMap;
+      zoomMap = 7;
+    } else if (zoomMap < 8) {
+      zoom2 = zoomMap - 1;
+    } else if (zoomMap < 14) {
+      zoom2 = zoomMap - 2;
+    } else if (zoomMap < 18) {
+      zoom2 = zoomMap - 6;
+    } else {
+      durationAnimation = 6000;
+      zoom2 = zoomMap - 10;
+    }
+    let parts = 2;
+    let called = false;
+    function callback(complete) {
+      -- parts;
+      if (called) {
+        return;
+      }
+      if (parts === 0 || !complete) {
+        called = true;
+        done(complete);
+      }
+    }
+    view.animate({
+      center: location,
+      duration: durationAnimation
+    }, callback);
+    view.animate({
+      zoom: zoom2,
+      duration: durationAnimation / 2
+    }, {
+      zoom: zoomMap,
+      duration: durationAnimation / 2
+    }, callback);
+  }
+
+  cargarRuta(point1, point2, callback ) {
+    const sedenaPoint = [];
+    this.getNearest(point2).then( coordStreet => {
+      sedenaPoint.push(coordStreet);
+      const denuncia = point1.join();
+      const sedena = sedenaPoint[0].join();
+      this.createFeature(point1);
+      this.createFeature(coordStreet);
+      fetch(this.urlOsrmRoute + sedena + ';' + denuncia).then(r => {
+        return r.json();
+      }).then(json => {
+        if (json.code !== 'Ok') {
+          return null;
+        }
+        this.createRoute(json.routes[0].geometry);
+        callback(true);
+      });
+    });
+    this.map.addLayer(this.sedenaLayer);
+  }
+
+  getNearest(coord) {
+    // const coord4326 = this.to4326(coord);
+    return new Promise((resolve, reject) => {
+      // make sure the coord is on street
+      fetch(this.urlOsrmNearest + coord.join()).then(response => {
+        // Convert to JSON
+        return response.json();
+      }).then(json => {
+        if (json.code === 'Ok') {
+          resolve(json.waypoints[0].location);
+        } else {
+          reject();
+        }
+      });
+    });
+  }
+
+  createFeature(coord) {
+    const feature = new Feature({
+      type: 'place',
+      geometry: new Point( coord )
+    });
+    feature.setStyle(this.sedenaStyle.icon);
+    this.sedenaSource.addFeature(feature);
+  }
+
+  createRoute(polyline) {
+    // route is ol.geom.LineString
+    this.route = new Polyline({
+      factor: 1e5
+    }).readGeometry(polyline, {
+      dataProjection: 'EPSG:4326',
+      featureProjection: 'EPSG:4326'
+    });
+    const feature = new Feature({
+      type: 'route',
+      geometry: this.route
+    });
+    feature.setStyle(this.sedenaStyle.route);
+    this.sedenaSource.addFeature(feature);
+  }
+
+  to4326(coord) {
+    return transform([
+      parseFloat(coord[0]), parseFloat(coord[1])
+    ], 'EPSG:3857', 'EPSG:4326');
+  }
+
+  starAnimation() {
+    if (this.animating) {
+      this.stopAnimation();
+    } else {
+      this.animating = true;
+      this.now = new Date().getTime();
+      this.speed = .1;
+      const routeCoords = this.route.getCoordinates();
+      const routeLength = routeCoords.length;
+      this.moveFeature = (event) => {
+        const vectorContext = event.vectorContext;
+        const frameState = event.frameState;
+        if (this.animating) {
+          const elapsedTime = frameState.time - this.now;
+          const index = Math.round(this.speed * elapsedTime / 1000);
+          if (index >= routeLength) {
+            this.stopAnimation();
+            return;
+          }
+          const currentPoint = new Point(routeCoords[index]);
+          const feature = new Feature(currentPoint);
+          vectorContext.drawFeature(feature, this.sedenaStyle.geoMarker);
+          this.map.render();
+        }
+      };
+      this.map.on('postcompose', this.moveFeature);
+      this.map.render();
+    }
+  }
+
+  stopAnimation() {
+    this.animating = false;
+    this.map.un('postcompose', this.moveFeature);
+  }
+
+  seguirSedena() {
+    const denuncia = this.loginService.getDenunciaCoord();
+
+    if (denuncia == null) {
+      return;
+    }
+    const x = this.random() * .001;
+    const y = this.random() * .001;
+
+    this.loginService.setSedenaCoord([denuncia[0] + x, denuncia[1] + y]);
+    const sedena = this.loginService.getSedenaCoord();
+
+    this.cargarRuta(denuncia, sedena, (status) => {
+      if (status) {
+        this.starAnimation();
+      }
+    });
+  }
+
+  random() {
+    return Math.random() * 2000 - 1000;
+  }
 }

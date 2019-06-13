@@ -1,7 +1,7 @@
-
 <div class="map" id="mapa">
 
 </div>
-<label>Mostrar posición actual<input id="trackpos" type="checkbox" [(ngModel)]="isChecked" (change)="toggleGeolocation(isChecked)"/></label>
+<!--label>Mostrar posición actual<input id="trackpos" type="checkbox" [(ngModel)]="isChecked" (change)="toggleGeolocation(isChecked)"/></label>
 <div  *ngIf='geolocationerror'>{{geolocationmsg}}</div>
-<div >{{geolocLiveCoords}}</div>
+<div >{{geolocLiveCoords}}</div-->
+<button type="button" class="btn btn-dark" (click)="seguirSedena()" >Ver seguimiento SEDENA</button>
