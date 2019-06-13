@@ -43,6 +43,7 @@ export class RealizarDenunciaService {
     console.log('denuncia ' + JSON.stringify(denuncia));
     console.log(httpOptions);
     console.log({headers: this.httpHeaders});
+    const userName = localStorage.getItem('userName');
     // const jsonDenuncia = JSON.stringify(denuncia);
     // console.log("DENUNCIA "+ jsonDenuncia+ "token"+this.httpHeaders);
     return this.http.post(this.url, JSON.stringify(denuncia), httpOptions).pipe(

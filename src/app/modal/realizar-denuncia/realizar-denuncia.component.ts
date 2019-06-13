@@ -20,6 +20,8 @@ export class RealizarDenunciaComponent implements OnInit {
   model: Denuncia;
   denuncia: Denuncia;
   sesion: boolean;
+  descriptions;
+  titles;
 
 
 
@@ -27,7 +29,18 @@ export class RealizarDenunciaComponent implements OnInit {
     private modalService: NgbModal, public realizarDenunciaService: RealizarDenunciaService,
     private router: Router, public datePipe: DatePipe) {
       this.sesion = false;
-      this.model = new Denuncia('Robo de combustible', 'Gente cavando');
+      this.model = new Denuncia('', '');
+      this.descriptions = new Array();
+      this.titles = new Array();
+      this.descriptions.push("Robo en ducto");
+      this.descriptions.push("Incendio en ducto");
+      this.descriptions.push("Gente cavando");
+      this.descriptions.push("Disturbios en la zona");
+      this.descriptions.push("Fuga");
+      this.titles.push("Robo de combustible");
+      this.titles.push("Incendio");
+      this.titles.push("Fuga");
+
   }
 
   ngOnInit() {
@@ -36,6 +49,8 @@ export class RealizarDenunciaComponent implements OnInit {
       this.router.navigate(['']);
     }
     this.sesion = true;
+    console.log(this.descriptions);
+    console.log(this.titles);
   }
 
   open(content) {
@@ -56,14 +71,19 @@ export class RealizarDenunciaComponent implements OnInit {
     // const date = this.datePipe.transform(today, 'yyyy-MM-dd'T'HH:mm:ss.SSSZ');
     const date = formatDate(today, "yyyy-MM-dd'T'HH:mm:ss.mmmZ", 'en');
     console.log('datesss: ' + date);
-    this.denuncia = new Denuncia(f.value.titulo, f.value.descripcion,
-      new Date(date) , {x: 99.1468518, y: 19.5046539, coordinates: [-99.1468518, 19.5046539], type: 'Point'}, '1');
+    const userName = localStorage.getItem('userName');
+    const lat = document.getElementById("lat").value;
+    const lng = document.getElementById("lng").value;
+    this.denuncia = new Denuncia(f.value.title, f.value.description,
+      new Date(date) , {x:lat , y: lng, coordinates: [lat,lng], type: 'Point'}, userName);
     this.realizarDenunciaService.setDenuncia(this.denuncia).subscribe( datos => {
         const dato = datos;
         console.log('denuncias ' + dato);
+        this.sesion = true;
+        document.getElementById("mensaje").innerHTML = "<div class='alert alert-success alert-dismissible fade show'><strong>Todo salio bien!</strong> Denuncia exitosa.<button type='button' class='close' data-dismiss='alert'>&times;</button></div>";
       }, err => {
-
         console.error(err);
+        document.getElementById("mensaje").innerHTML = "<div class='alert alert-warning alert-dismissible fade show'><strong>ERROR!</strong>"+err +"<button type='button' class='close' data-dismiss='alert'>&times;</button></div>";
         /*const messageError = JSON.stringify(err.error.error);
         console.log(messageError + ' = ' + environment.invalidToken + ' : ');
         console.log(messageError.match(environment.invalidToken));
@@ -75,6 +95,7 @@ export class RealizarDenunciaComponent implements OnInit {
           this.router.navigate(['']);*/
       }
     );
+    this.router.navigate(['user']);
 
     /*f.reset();*/
   }
