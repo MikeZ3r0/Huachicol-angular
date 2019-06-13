@@ -33,6 +33,7 @@ import {DatePipe} from '@angular/common';
 import { RegistroUsuarioComponent } from './registro-usuario/registro-usuario.component';
 
 import { RegistroUsuarioService } from './registro-usuario/registro-usuario.service';
+import { MapaUsuarioComponent } from './mapa/mapa-usuario/mapa-usuario.component';
 
 
 @NgModule({
@@ -45,7 +46,8 @@ import { RegistroUsuarioService } from './registro-usuario/registro-usuario.serv
     ServiciosComponent,
     MostrarDenunciaComponent,
     RealizarDenunciaComponent,
-    RegistroUsuarioComponent
+    RegistroUsuarioComponent,
+    MapaUsuarioComponent
   ],
   imports: [
     BrowserModule,
