@@ -18,9 +18,11 @@ export class MostrarDenunciaComponent implements OnInit {
   token;
   datos;
   sesion: boolean;
+  vacio: boolean;
 
   constructor(private modalService: NgbModal, private mostrarDenunciaService: MostrarDenunciaService, private router: Router) {
     this.sesion = false;
+    this.vacio=true;
   }
 
   ngOnInit() {
@@ -38,11 +40,17 @@ export class MostrarDenunciaComponent implements OnInit {
       this.datos = datos;
       const denunciaString = JSON.stringify(this.datos);
       const denunciaJSON = JSON.parse(denunciaString);
-      for (let i = 0; i < denunciaJSON.length; i++) {
-        this.denuncia = new Denuncia(denunciaJSON[i].titulo, denunciaJSON[i].descripcion, denunciaJSON[i].sendDate,
-          denunciaJSON[i].punto.coordinates,  denunciaJSON[i].userId, denunciaJSON[i]._id);
-        this.denuncias.push(this.denuncia);
+      if(denunciaJSON.length!=null){
+        this.vacio=false;
+        for (let i = 0; i < denunciaJSON.length; i++) {
+          this.denuncia = new Denuncia(denunciaJSON[i].titulo, denunciaJSON[i].descripcion, denunciaJSON[i].sendDate,
+            denunciaJSON[i].punto.coordinates,  denunciaJSON[i].email, denunciaJSON[i]._id);
+          this.denuncias.push(this.denuncia);
+        }
+      }else{
+        this.vacio=true;
       }
+
     }, (err: any) => {
       const messageError = JSON.stringify(err.error.error);
       console.log(messageError + ' = ' + environment.invalidToken + ' : ');

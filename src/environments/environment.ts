@@ -12,6 +12,7 @@ export const environment = {
   passAuth: '12345',
   userRole: 'CIUDADANO_ROLE',
   adminRole: 'ADMINISTRADOR_ROLE',
+  sedenaRole: 'SEDENA_ROLE',
   invalidToken: 'invalid_token',
   crearDenuncia: 'https://damp-ocean-98658.herokuapp.com/api/v1/user/complain/',
   mostrarDenuncia: 'https://damp-ocean-98658.herokuapp.com/api/v1/user/complains/',

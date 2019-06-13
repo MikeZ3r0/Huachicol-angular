@@ -5,3 +5,10 @@
 .ng-invalid:not(form)  {
   border-left: 5px solid #a94442; /* red */
 }
+
+.modal-body{
+  overflow-y: scroll;
+}
+.bs-example{
+    	margin: 20px;
+    }

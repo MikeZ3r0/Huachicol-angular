@@ -18,6 +18,7 @@ export class LoginComponent implements OnInit {
   data;
   rolUser: string;
   rolAdmin: string;
+  rolSedena: string;
   cargando: boolean;
   modalReference: NgbModalRef;
   opcion1: string;
@@ -30,6 +31,7 @@ export class LoginComponent implements OnInit {
   constructor(private modalService: NgbModal, private loginService: LoginService, private router: Router) {
     this.rolAdmin = environment.adminRole;
     this.rolUser = environment.userRole;
+    this.rolSedena = environment.sedenaRole;
     this.cargando = false;
     this.opcion1 = 'Iniciar sesión';
     this.opcion2 = 'Registrarse';
@@ -66,14 +68,19 @@ export class LoginComponent implements OnInit {
         this.loginService.setAccount(true);
         this.router.navigate(['admin']);
       } else if ((usuario.match(this.rolUser) !== null)) {
+        document.getElementById('mensaje').innerHTML = '<div class="alert alert-success alert-dismissible fade show">' +
+            '<strong>Todo salio bien!</strong> Inicio de sesión exitoso.' +
+            '<button type="button" class="close" data-dismiss="alert">&times;</button></div>';
         this.router.navigate(['user']);
         this.sesion = true;
       } else {
-        this.router.navigate(['']);
-        this.sesion = false;
-      }
-      this.modalReference.close();
-    }, err => {
+          this.router.navigate(['']);
+          this.sesion = false;
+        }
+      }, err => {
+        document.getElementById('mensaje').innerHTML = '<div class="alert alert-warning alert-dismissible fade show">' +
+          '<strong>ERROR!</strong>' + err +
+          '<button type="button" class="close" data-dismiss="alert">&times;</button></div>';
         this.cargando = false;
         (document.getElementById('logButton') as HTMLInputElement).disabled = false;
         console.log(err);
@@ -85,6 +92,9 @@ export class LoginComponent implements OnInit {
 
   logOut() {
     this.loginService.finalizarSesion();
+    /* document.getElementById("mensaje").innerHTML = "<div class='alert alert-success alert-dismissible fade show'>
+    <strong>Todo salio bien!</strong> Se cerró la sesión exitosamente.
+    <button type='button' class='close' data-dismiss='alert'>&times;</button></div>";*/
     this.sesion = false;
     this.router.navigate(['']);
   }

@@ -20,7 +20,7 @@ export class RegistroUsuarioComponent implements OnInit {
 
   constructor(private modalService: NgbModal,public registrarUsuarioService: RegistroUsuarioService, private router: Router ) {
     this.sesion = false;
-    this.usuarioModel = new Usuario('Adán', 'distribuidos@prueba.com', 445558839, 'killinHuachicol',[{profileName: "CIUDADANO_ROLE"}]);
+    this.usuarioModel = new Usuario('', '', 445558839, '',[{profileName: "CIUDADANO_ROLE"}]);
   }
 
   ngOnInit() {

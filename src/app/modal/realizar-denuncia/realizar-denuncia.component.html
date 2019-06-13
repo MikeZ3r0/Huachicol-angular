@@ -7,23 +7,25 @@
       </button>
     </div>
     <div class="modal-body">
-      <app-mapa></app-mapa>
-      <br>
-      <br>
+      <app-mapa-usuario></app-mapa-usuario>
       <form (ngSubmit)="onSubmit(denunciaForm)" #denunciaForm ="ngForm">
         <div class="form-group">
-          <label for="titulo">Título de la denuncia</label>
-          <input type="text" name="titulo" id="titulo" class="form-control" placeholder="Titlo de tu denuncia" required [(ngModel)]="model.titulo" #titulo="ngModel">
-          <div [hidden]="titulo.valid || titulo.pristine" class="alert alert-danger">
-            Es necesario agregar un título
-          </div>
+          <label for="titulo">Título de la denuncia</label><br>
+          <select name="title" [(ngModel)]="titles.value" id="title" requiered #title="ngModel" class="form-control">
+           <option value="" disabled selected>Selecciona un título</option>
+           <option *ngFor="let title of titles" [value]="title">{{title}}</option>
+         </select>
         </div>
         <div class="form-group">
-          <label for="descripcion">Descripción de la denuncia</label>
-          <textarea name="descripcion" id="descripcion" rows="4" cols="80" class="form-control" placeholder="Descripcion de tu denuncia" required [(ngModel)]="model.descripcion" #descripcion="ngModel"></textarea>
-          <div [hidden]="descripcion.valid || descripcion.pristine" class="alert alert-danger">
-            Es necesario agregar una breve descripcion
-          </div>
+          <label for="descripcion">Descripción de la denuncia</label><br>
+          <select name="description" [(ngModel)]="descriptions.value" id="description" requiered #description= "ngModel" class="form-control">
+           <option value="" disabled selected>Selecciona una breve descripción</option>
+           <option *ngFor="let description of descriptions" [value]="description">{{description}}</option>
+         </select>
+        </div>
+        <div class="form-group">
+          <input id="lat" type="hidden" value="" required>
+          <input id="lng" type="hidden" value="" required>
         </div>
       </form>
     </div>
@@ -36,5 +38,7 @@
 </ng-template>
 
 <button  type="button" class="btn btn-lg btn-outline-primary" (click)="open(content)">Denunciar</button>
-
 <hr>
+<div id="mensaje" class="bs-example">
+
+</div>
